@@ -1,2 +1,4 @@
 ﻿<Solution>
+  <Project Path="RevealGame.csproj" />
+  <Project Path="RevealGame.Tests.csproj" />
 </Solution>
