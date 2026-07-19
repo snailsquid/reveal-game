@@ -9,6 +9,9 @@ namespace RevealGame.UI
         [Header("UI References")]
         [SerializeField] private RawImage _hintMediaImage;
         [SerializeField] private Text _hintTitleText;
+        [SerializeField] private Button _previousHintImageButton;
+        [SerializeField] private Button _nextHintImageButton;
+        [SerializeField] private Text _hintImagePaginationText;
         [SerializeField] private InputField _answerInput;
         [SerializeField] private Button _submitButton;
         [SerializeField] private GameObject _resultPopup;
@@ -18,6 +21,8 @@ namespace RevealGame.UI
 
         private GameManager _gameManager;
         private OpeningState _openingState;
+        private int _currentHintImageIndex;
+        private int _currentHintImageCount;
 
         private enum OpeningState
         {
@@ -39,6 +44,21 @@ namespace RevealGame.UI
             {
                 var t = transform.Find("HintTitleText");
                 if (t != null) _hintTitleText = t.GetComponent<Text>();
+            }
+            if (_previousHintImageButton == null)
+            {
+                var previous = transform.Find("PreviousHintImageButton");
+                if (previous != null) _previousHintImageButton = previous.GetComponent<Button>();
+            }
+            if (_nextHintImageButton == null)
+            {
+                var next = transform.Find("NextHintImageButton");
+                if (next != null) _nextHintImageButton = next.GetComponent<Button>();
+            }
+            if (_hintImagePaginationText == null)
+            {
+                var pagination = transform.Find("HintImagePaginationText");
+                if (pagination != null) _hintImagePaginationText = pagination.GetComponent<Text>();
             }
             if (_answerInput == null)
             {
@@ -77,6 +97,12 @@ namespace RevealGame.UI
                 SetButtonLabelColor(_submitButton, new Color(0.08f, 0.16f, 0.12f));
             }
 
+            EnsureHintImageCarouselControls();
+            if (_previousHintImageButton != null)
+                _previousHintImageButton.onClick.AddListener(ShowPreviousHintImage);
+            if (_nextHintImageButton != null)
+                _nextHintImageButton.onClick.AddListener(ShowNextHintImage);
+
             if (_continueButton != null)
             {
                 _continueButton.onClick.AddListener(OnContinue);
@@ -112,28 +138,68 @@ namespace RevealGame.UI
         {
             var hint = _gameManager.HintGameEngine.GetCurrentHint();
             if (hint == null)
+            {
+                _currentHintImageCount = 0;
+                _currentHintImageIndex = 0;
+                UpdateHintImageCarouselControls();
                 return;
+            }
 
             if (_hintTitleText != null)
                 _hintTitleText.text = string.IsNullOrEmpty(hint.title) ? "Solve the puzzle!" : hint.title;
 
-            if (_hintMediaImage != null && _gameManager.MediaDisplay != null)
+            _currentHintImageCount = hint.mediaPaths?.Length ?? 0;
+            _currentHintImageIndex = 0;
+            ShowHintImage(hint);
+            UpdateHintImageCarouselControls();
+
+            if (_answerInput != null)
+                _answerInput.Select();
+        }
+
+        private void ShowPreviousHintImage()
+        {
+            if (_currentHintImageIndex == 0)
+                return;
+
+            _currentHintImageIndex--;
+            RefreshCurrentHintImage();
+        }
+
+        private void ShowNextHintImage()
+        {
+            if (_currentHintImageIndex >= _currentHintImageCount - 1)
+                return;
+
+            _currentHintImageIndex++;
+            RefreshCurrentHintImage();
+        }
+
+        private void RefreshCurrentHintImage()
+        {
+            var hint = _gameManager.HintGameEngine.GetCurrentHint();
+            if (hint == null)
+                return;
+
+            ShowHintImage(hint);
+            UpdateHintImageCarouselControls();
+        }
+
+        private void ShowHintImage(Data.HintData hint)
+        {
+            if (_hintMediaImage == null || _gameManager.MediaDisplay == null)
+                return;
+
+            if (_currentHintImageCount > 0)
             {
-                if (hint.mediaPaths != null && hint.mediaPaths.Length > 0)
+                string mediaPath = hint.mediaPaths[_currentHintImageIndex];
+                if (!string.IsNullOrEmpty(mediaPath))
                 {
-                    string mediaPath = hint.mediaPaths[0];
-                    if (!string.IsNullOrEmpty(mediaPath))
+                    var sprite = _gameManager.MediaDisplay.LoadSprite(mediaPath);
+                    if (sprite != null)
                     {
-                        var sprite = _gameManager.MediaDisplay.LoadSprite(mediaPath);
-                        if (sprite != null)
-                        {
-                            _hintMediaImage.texture = sprite.texture;
-                            _hintMediaImage.gameObject.SetActive(true);
-                        }
-                        else
-                        {
-                            _hintMediaImage.gameObject.SetActive(false);
-                        }
+                        _hintMediaImage.texture = sprite.texture;
+                        _hintMediaImage.gameObject.SetActive(true);
                     }
                     else
                     {
@@ -145,9 +211,10 @@ namespace RevealGame.UI
                     _hintMediaImage.gameObject.SetActive(false);
                 }
             }
-
-            if (_answerInput != null)
-                _answerInput.Select();
+            else
+            {
+                _hintMediaImage.gameObject.SetActive(false);
+            }
         }
 
         private void OnSubmitAnswer()
@@ -304,8 +371,84 @@ namespace RevealGame.UI
         {
             if (_hintTitleText != null) _hintTitleText.gameObject.SetActive(visible);
             if (_hintMediaImage != null) _hintMediaImage.gameObject.SetActive(visible);
+            SetHintImageCarouselControlsVisible(visible && _currentHintImageCount > 1);
             if (_answerInput != null) _answerInput.gameObject.SetActive(visible);
             if (_submitButton != null) _submitButton.gameObject.SetActive(visible);
+        }
+
+        private void UpdateHintImageCarouselControls()
+        {
+            bool hasMultipleImages = _currentHintImageCount > 1;
+            SetHintImageCarouselControlsVisible(hasMultipleImages);
+
+            if (_previousHintImageButton != null)
+                _previousHintImageButton.interactable = _currentHintImageIndex > 0;
+            if (_nextHintImageButton != null)
+                _nextHintImageButton.interactable = _currentHintImageIndex < _currentHintImageCount - 1;
+            if (_hintImagePaginationText != null)
+                _hintImagePaginationText.text = hasMultipleImages
+                    ? $"{_currentHintImageIndex + 1} / {_currentHintImageCount}"
+                    : string.Empty;
+        }
+
+        private void SetHintImageCarouselControlsVisible(bool visible)
+        {
+            if (_previousHintImageButton != null) _previousHintImageButton.gameObject.SetActive(visible);
+            if (_nextHintImageButton != null) _nextHintImageButton.gameObject.SetActive(visible);
+            if (_hintImagePaginationText != null) _hintImagePaginationText.gameObject.SetActive(visible);
+        }
+
+        private void EnsureHintImageCarouselControls()
+        {
+            if (_submitButton == null)
+                return;
+
+            if (_previousHintImageButton == null)
+                _previousHintImageButton = CreateHintImageNavigationButton("PreviousHintImageButton", "<", new Vector2(0.30f, 0.70f));
+            if (_nextHintImageButton == null)
+                _nextHintImageButton = CreateHintImageNavigationButton("NextHintImageButton", ">", new Vector2(0.70f, 0.70f));
+
+            if (_hintImagePaginationText != null)
+                return;
+
+            var paginationObject = new GameObject("HintImagePaginationText", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+            paginationObject.transform.SetParent(transform, false);
+            var paginationRect = paginationObject.GetComponent<RectTransform>();
+            paginationRect.anchorMin = new Vector2(0.42f, 0.52f);
+            paginationRect.anchorMax = new Vector2(0.58f, 0.55f);
+            paginationRect.offsetMin = Vector2.zero;
+            paginationRect.offsetMax = Vector2.zero;
+
+            _hintImagePaginationText = paginationObject.GetComponent<Text>();
+            _hintImagePaginationText.font = _hintTitleText != null
+                ? _hintTitleText.font
+                : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+            _hintImagePaginationText.fontSize = 16;
+            _hintImagePaginationText.color = Color.white;
+            _hintImagePaginationText.alignment = TextAnchor.MiddleCenter;
+        }
+
+        private Button CreateHintImageNavigationButton(string name, string labelText, Vector2 anchor)
+        {
+            var buttonObject = Instantiate(_submitButton.gameObject, transform);
+            buttonObject.name = name;
+            var button = buttonObject.GetComponent<Button>();
+            button.onClick.RemoveAllListeners();
+
+            var buttonRect = buttonObject.GetComponent<RectTransform>();
+            buttonRect.anchorMin = anchor;
+            buttonRect.anchorMax = anchor;
+            buttonRect.anchoredPosition = Vector2.zero;
+            buttonRect.sizeDelta = new Vector2(48f, 48f);
+
+            var label = button.GetComponentInChildren<Text>(true);
+            if (label != null)
+            {
+                label.text = labelText;
+                label.fontSize = 28;
+            }
+
+            return button;
         }
 
         private void EnsureBackButton()

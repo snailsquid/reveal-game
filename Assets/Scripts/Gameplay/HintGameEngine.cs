@@ -38,6 +38,14 @@ namespace RevealGame.Gameplay
         }
 
         /// <summary>
+        /// Gets the active hint, assigning a random one only when the lootbox has none.
+        /// </summary>
+        public Data.HintData GetOrAssignHint()
+        {
+            return GetCurrentHint() ?? AssignNewHint();
+        }
+
+        /// <summary>
         /// Checks if the player's answer is correct for the current hint.
         /// </summary>
         public bool CheckAnswer(string playerAnswer)

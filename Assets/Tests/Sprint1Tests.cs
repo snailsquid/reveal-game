@@ -182,6 +182,28 @@ namespace RevealGame.Tests
     public class YamlGameConfigParserTests
     {
         [Test]
+        public void TryParse_WhenHintHasMultipleImages_PreservesImageOrder()
+        {
+            const string yaml = @"items:
+  - id: item_1
+    title: First Item
+    description: First description
+settings:
+  nLootbox: 1
+hints:
+  - hintType: image
+    answer: answer
+    mediaPaths:
+      - hints/first.png
+      - hints/second.png";
+
+            var parsed = YamlGameConfigParser.TryParse(yaml, out var config, out var error);
+
+            Assert.IsTrue(parsed, error);
+            Assert.AreEqual(new[] { "hints/first.png", "hints/second.png" }, config.hints[0].mediaPaths);
+        }
+
+        [Test]
         public void TryParse_WhenLootboxesExceedItems_ReturnsError()
         {
             const string yaml = @"items:
@@ -362,6 +384,18 @@ hints:
             bool result = engine.CheckAnswer("WrongAnswer");
 
             Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void GetOrAssignHint_WhenHintIsAlreadyActive_ReusesTheSameHint()
+        {
+            var session = CreateTestSession();
+            var engine = new HintGameEngine(session);
+
+            var assignedHint = engine.AssignNewHint();
+            var reusedHint = engine.GetOrAssignHint();
+
+            Assert.AreSame(assignedHint, reusedHint);
         }
 
         [Test]

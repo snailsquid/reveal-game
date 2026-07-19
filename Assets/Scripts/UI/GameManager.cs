@@ -144,8 +144,7 @@ namespace RevealGame.UI
             _lootboxScreen.SetActive(false);
             _hintGameScreen.SetActive(true);
 
-            // Assign a new hint and notify the hint game UI
-            _hintGameEngine.AssignNewHint();
+            _hintGameEngine.GetOrAssignHint();
             var controller = _hintGameScreen.GetComponent<HintGameUIController>();
             if (controller != null)
                 controller.ShowCurrentHint();
