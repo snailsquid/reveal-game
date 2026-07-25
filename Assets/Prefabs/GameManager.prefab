@@ -1,0 +1,76 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4288817265910974683
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4873927856354651942}
+  - component: {fileID: 8537174245286221306}
+  - component: {fileID: 6721386985220600331}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4873927856354651942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4288817265910974683}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8537174245286221306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4288817265910974683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab3c2f38b6d06456594ac7e67e3cc5cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RevealGame::RevealGame.UI.GameManager
+  _titleScreen: {fileID: 0}
+  _lootboxScreen: {fileID: 0}
+  _hintGameScreen: {fileID: 0}
+  _mediaDisplay: {fileID: 0}
+  _discordServerUrl: http://localhost:3000
+  _discordServerApiKey: dev-insecure-key
+  _discordHealthCheckInterval: 2
+  _discordSessionPollInterval: 1
+  _discordListenerProcessLauncher: {fileID: 0}
+  _channelIds:
+  - 1510643581671702728
+  _botStatusImage: {fileID: 0}
+--- !u!114 &6721386985220600331
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4288817265910974683}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3980cecd7e4d928e59d93264eec9e772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RevealGame::RevealGame.UI.GameInitializer
+  _testConfig:
+    items: []
+    hints: []
+    settings:
+      nLootbox: 0

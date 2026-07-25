@@ -107,3 +107,19 @@ InitTestScene*.unity*
 
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
+
+# MemPalace per-project files (issue #185)
+mempalace.yaml
+entities.json
+
+# Opencode
+.omo/
+opencode.jsonc
+
+# Build-generated (copied at build time by DiscordListenerBuildPreprocessor)
+Assets/StreamingAssets/
+Assets/StreamingAssets.meta
+
+# Unity crash recovery
+Assets/_Recovery/
+Assets/_Recovery.meta
