@@ -20,7 +20,9 @@ namespace RevealGame.UI
         [SerializeField] private Button _backButton;
         [SerializeField] private Text _discordStatusText;
 
-        private GameManager _gameManager;
+        [Header("Dependencies")]
+        [SerializeField] private GameManager _gameManager;
+
         private OpeningState _openingState;
         private int _currentHintImageIndex;
         private int _currentHintImageCount;
@@ -36,70 +38,6 @@ namespace RevealGame.UI
 
         private void Awake()
         {
-            _gameManager = FindAnyObjectByType<GameManager>();
-
-            if (_hintMediaImage == null)
-            {
-                var m = transform.Find("HintMediaImage");
-                if (m != null) _hintMediaImage = m.GetComponent<RawImage>();
-            }
-            if (_hintTitleText == null)
-            {
-                var t = transform.Find("HintTitleText");
-                if (t != null) _hintTitleText = t.GetComponent<Text>();
-            }
-            if (_previousHintImageButton == null)
-            {
-                var previous = transform.Find("PreviousHintImageButton");
-                if (previous != null) _previousHintImageButton = previous.GetComponent<Button>();
-            }
-            if (_nextHintImageButton == null)
-            {
-                var next = transform.Find("NextHintImageButton");
-                if (next != null) _nextHintImageButton = next.GetComponent<Button>();
-            }
-            if (_hintImagePaginationText == null)
-            {
-                var pagination = transform.Find("HintImagePaginationText");
-                if (pagination != null) _hintImagePaginationText = pagination.GetComponent<Text>();
-            }
-            if (_answerInput == null)
-            {
-                var i = transform.Find("AnswerInput");
-                if (i != null) _answerInput = i.GetComponent<InputField>();
-            }
-            if (_submitButton == null)
-            {
-                var s = transform.Find("SubmitButton");
-                if (s != null) _submitButton = s.GetComponent<Button>();
-            }
-            if (_resultPopup == null)
-            {
-                var p = transform.Find("ResultPopup");
-                if (p != null) _resultPopup = p.gameObject;
-            }
-            if (_resultText == null && _resultPopup != null)
-            {
-                var r = _resultPopup.transform.Find("ResultText");
-                if (r != null) _resultText = r.GetComponent<Text>();
-            }
-            if (_continueButton == null && _resultPopup != null)
-            {
-                var c = _resultPopup.transform.Find("ContinueButton");
-                if (c != null) _continueButton = c.GetComponent<Button>();
-            }
-            if (_backButton == null)
-            {
-                var back = transform.Find("BackButton");
-                if (back != null) _backButton = back.GetComponent<Button>();
-            }
-
-            if (_discordStatusText == null)
-            {
-                var status = transform.Find("DiscordStatusText");
-                if (status != null) _discordStatusText = status.GetComponent<Text>();
-            }
-
             if (_submitButton != null)
                 SetButtonLabelColor(_submitButton, new Color(0.08f, 0.16f, 0.12f));
 
@@ -171,7 +109,7 @@ namespace RevealGame.UI
             if (_hintTitleText != null)
                 _hintTitleText.text = string.IsNullOrEmpty(hint.title) ? "Solve the puzzle!" : hint.title;
 
-            _currentHintImageCount = hint.mediaPaths?.Length ?? 0;
+            _currentHintImageCount = _gameManager.MediaDisplay?.GetHintMediaCount(hint) ?? 0;
             _currentHintImageIndex = 0;
             ShowHintImage(hint);
             UpdateHintImageCarouselControls();
@@ -215,19 +153,11 @@ namespace RevealGame.UI
 
             if (_currentHintImageCount > 0)
             {
-                string mediaPath = hint.mediaPaths[_currentHintImageIndex];
-                if (!string.IsNullOrEmpty(mediaPath))
+                var sprite = _gameManager.MediaDisplay.ResolveHintSprite(hint, _currentHintImageIndex);
+                if (sprite != null)
                 {
-                    var sprite = _gameManager.MediaDisplay.LoadSprite(mediaPath);
-                    if (sprite != null)
-                    {
-                        _hintMediaImage.texture = sprite.texture;
-                        _hintMediaImage.gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        _hintMediaImage.gameObject.SetActive(false);
-                    }
+                    _hintMediaImage.texture = sprite.texture;
+                    _hintMediaImage.gameObject.SetActive(true);
                 }
                 else
                 {

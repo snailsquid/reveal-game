@@ -11,41 +11,24 @@ namespace RevealGame.UI
         [SerializeField] private GameObject _lootboxButtonPrefab;
         [SerializeField] private Button _backButton;
 
-        private GameManager _gameManager;
+        [Header("Dependencies")]
+        [SerializeField] private GameManager _gameManager;
+        [SerializeField] private ResponsiveUiLayout _responsiveUiLayout;
+
         private List<LootboxButtonController> _buttonControllers = new List<LootboxButtonController>();
 
         private void Awake()
         {
-            _gameManager = FindAnyObjectByType<GameManager>();
-
             if (_lootboxGridContainer == null)
             {
-                var grid = transform.Find("LootboxGrid");
-                if (grid != null) _lootboxGridContainer = grid;
-            }
-
-            if (_backButton == null)
-            {
-                var back = transform.Find("BackButton");
-                if (back != null) _backButton = back.GetComponent<Button>();
-            }
-
-            if (_lootboxButtonPrefab == null)
-            {
-                var prefab = transform.Find("LootboxGrid/LootboxButtonRef");
-                if (prefab != null) _lootboxButtonPrefab = prefab.gameObject;
-            }
-
-            if (_lootboxGridContainer == null)
-            {
-                Debug.LogError("[LootboxScreenController] LootboxGrid not found");
+                Debug.LogError("[LootboxScreenController] LootboxGrid not assigned");
                 enabled = false;
                 return;
             }
 
             if (_lootboxButtonPrefab == null)
             {
-                Debug.LogError("[LootboxScreenController] LootboxButtonPrefab not found");
+                Debug.LogError("[LootboxScreenController] LootboxButtonPrefab not assigned");
                 enabled = false;
                 return;
             }
@@ -63,7 +46,7 @@ namespace RevealGame.UI
         private void OnEnable()
         {
             RefreshGrid();
-            FindAnyObjectByType<ResponsiveUiLayout>()?.RefreshLayout();
+            _responsiveUiLayout?.RefreshLayout();
         }
 
         public void RefreshGrid()

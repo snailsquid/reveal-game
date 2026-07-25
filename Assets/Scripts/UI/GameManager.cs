@@ -20,6 +20,7 @@ namespace RevealGame.UI
 
         [Header("Dependencies")]
         [SerializeField] private MediaDisplayController _mediaDisplay;
+        [SerializeField] private Image _botStatusImage;
 
         [Header("Discord Answer Server")]
         [SerializeField] private string _discordServerUrl = "http:" + "/" + "/localhost:3000";
@@ -28,7 +29,6 @@ namespace RevealGame.UI
         [SerializeField, Min(0.25f)] private float _discordSessionPollInterval = 1f;
         [SerializeField] private DiscordListenerProcessLauncher _discordListenerProcessLauncher;
         [SerializeField] private string[] _channelIds;
-        [SerializeField] private Image _botStatusImage;
 
         private GameSession _session;
         private LootboxEngine _lootboxEngine;
@@ -61,36 +61,6 @@ namespace RevealGame.UI
 
         private void Awake()
         {
-            var canvas = GameObject.Find("Canvas");
-            if (canvas != null)
-            {
-                if (_titleScreen == null)
-                {
-                    var t = canvas.transform.Find("TitleScreen");
-                    if (t != null) _titleScreen = t.gameObject;
-                }
-                if (_lootboxScreen == null)
-                {
-                    var l = canvas.transform.Find("LootboxScreen");
-                    if (l != null) _lootboxScreen = l.gameObject;
-                }
-                if (_hintGameScreen == null)
-                {
-                    var h = canvas.transform.Find("HintGameScreen");
-                    if (h != null) _hintGameScreen = h.gameObject;
-                }
-            }
-
-            if (_mediaDisplay == null)
-                _mediaDisplay = FindAnyObjectByType<MediaDisplayController>();
-
-            if (_botStatusImage == null)
-            {
-                var botStatus = GameObject.Find("BotStatus");
-                if (botStatus != null)
-                    _botStatusImage = botStatus.GetComponent<Image>();
-            }
-
             _session = GameSession.Instance;
             _openingStrategy = _strategyRegistry.GetRequired(DeclaredWinnersOpeningStrategy.StrategyId);
 

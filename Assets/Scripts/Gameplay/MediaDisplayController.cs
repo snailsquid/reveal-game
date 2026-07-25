@@ -34,6 +34,42 @@ namespace RevealGame.Gameplay
             }
         }
 
+        public Sprite ResolveItemSprite(Data.ItemData item)
+        {
+            if (item == null)
+                return FallbackSprite;
+
+            if (item.HasDirectMedia)
+                return item.sprite ?? FallbackSprite;
+
+            return LoadSprite(item.mediaPath);
+        }
+
+        public Sprite ResolveHintSprite(Data.HintData hint, int index)
+        {
+            if (hint == null)
+                return FallbackSprite;
+
+            if (hint.HasDirectMedia && index >= 0 && index < hint.sprites.Length)
+                return hint.sprites[index] ?? FallbackSprite;
+
+            if (hint.mediaPaths != null && index >= 0 && index < hint.mediaPaths.Length)
+                return LoadSprite(hint.mediaPaths[index]);
+
+            return FallbackSprite;
+        }
+
+        public int GetHintMediaCount(Data.HintData hint)
+        {
+            if (hint == null)
+                return 0;
+
+            if (hint.HasDirectMedia)
+                return hint.sprites.Length;
+
+            return hint.mediaPaths?.Length ?? 0;
+        }
+
         /// <summary>
         /// Loads a sprite from a file path.
         /// </summary>

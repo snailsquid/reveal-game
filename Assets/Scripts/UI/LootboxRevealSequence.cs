@@ -164,7 +164,7 @@ namespace RevealGame.UI
 
         private void SetCardTexture(RawImage card, Data.ItemData item)
         {
-            var sprite = _mediaDisplay == null ? null : _mediaDisplay.LoadSprite(item?.mediaPath);
+            var sprite = _mediaDisplay == null ? null : _mediaDisplay.ResolveItemSprite(item);
             card.texture = sprite == null ? null : sprite.texture;
         }
 

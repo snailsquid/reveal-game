@@ -21,7 +21,6 @@ yaml file contains the following
 1. A list of items (required)
    An item includes:
 
-- id (required)
 - video/image path (optional, default: broken.png)
 - title (required)
 - description (required)

@@ -21,23 +21,7 @@ namespace RevealGame.UI
 
         private void Awake()
         {
-            // Try to auto-find references if not set
             if (_button == null) _button = GetComponent<Button>();
-            if (_indexLabel == null)
-            {
-                var label = transform.Find("IndexLabel");
-                _indexLabel = label != null ? label.GetComponent<Text>() : GetComponentInChildren<Text>();
-            }
-            if (_winnerLabel == null)
-            {
-                var label = transform.Find("WinnerLabel");
-                if (label != null) _winnerLabel = label.GetComponent<Text>();
-            }
-            if (_openedOverlay == null)
-            {
-                var overlay = transform.Find("OpenedOverlay");
-                if (overlay != null) _openedOverlay = overlay.gameObject;
-            }
         }
 
         /// <summary>

@@ -179,53 +179,63 @@ namespace RevealGame.Tests
     }
 
     [TestFixture]
-    public class YamlGameConfigParserTests
+    public class GameConfigSOTests
     {
-        [Test]
-        public void TryParse_WhenHintHasMultipleImages_PreservesImageOrder()
+        private static GameConfigSO CreateValidConfigSO()
         {
-            const string yaml = @"items:
-  - id: item_1
-    title: First Item
-    description: First description
-settings:
-  nLootbox: 1
-hints:
-  - hintType: image
-    answer: answer
-    mediaPaths:
-      - hints/first.png
-      - hints/second.png";
+            var so = UnityEngine.ScriptableObject.CreateInstance<GameConfigSO>();
+            var serialized = new UnityEditor.SerializedObject(so);
+            serialized.FindProperty("_nLootbox").intValue = 1;
 
-            var parsed = YamlGameConfigParser.TryParse(yaml, out var config, out var error);
+            var items = serialized.FindProperty("_items");
+            items.arraySize = 2;
+            items.GetArrayElementAtIndex(0).FindPropertyRelative("title").stringValue = "First Item";
+            items.GetArrayElementAtIndex(0).FindPropertyRelative("description").stringValue = "First description";
+            items.GetArrayElementAtIndex(1).FindPropertyRelative("title").stringValue = "Second Item";
+            items.GetArrayElementAtIndex(1).FindPropertyRelative("description").stringValue = "Second description";
 
-            Assert.IsTrue(parsed, error);
-            Assert.AreEqual(new[] { "hints/first.png", "hints/second.png" }, config.hints[0].mediaPaths);
+            var hints = serialized.FindProperty("_hints");
+            hints.arraySize = 1;
+            hints.GetArrayElementAtIndex(0).FindPropertyRelative("answer").stringValue = "answer";
+
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return so;
         }
 
         [Test]
-        public void TryParse_WhenLootboxesExceedItems_ReturnsError()
+        public void Validate_ValidConfig_ReturnsTrue()
         {
-            const string yaml = @"items:
-  - id: item_1
-    title: First Item
-    description: First description
-  - id: item_2
-    title: Second Item
-    description: Second description
-settings:
-  nLootbox: 3
-hints:
-  - hintType: image
-    answer: answer
-    mediaPaths:
-      - hint.png";
+            var so = CreateValidConfigSO();
 
-            var parsed = YamlGameConfigParser.TryParse(yaml, out var config, out var error);
+            Assert.IsTrue(so.Validate(out var error), error);
+            UnityEngine.Object.DestroyImmediate(so);
+        }
 
-            Assert.IsFalse(parsed);
-            Assert.IsNull(config);
+        [Test]
+        public void Validate_LootboxExceedsItems_ReturnsError()
+        {
+            var so = CreateValidConfigSO();
+            new UnityEditor.SerializedObject(so).FindProperty("_nLootbox").intValue = 3;
+
+            Assert.IsFalse(so.Validate(out var error));
             Assert.That(error, Does.Contain("cannot exceed the number of items"));
+            UnityEngine.Object.DestroyImmediate(so);
+        }
+
+        [Test]
+        public void ToGameConfig_MapsAllFields()
+        {
+            var so = CreateValidConfigSO();
+
+            var config = ScriptableObjectConfigAdapter.ToGameConfig(so);
+
+            Assert.AreEqual(1, config.settings.nLootbox);
+            Assert.AreEqual(2, config.items.Length);
+            Assert.AreEqual("item_0", config.items[0].id);
+            Assert.AreEqual("item_1", config.items[1].id);
+            Assert.AreEqual(1, config.hints.Length);
+            Assert.AreEqual("hint_0", config.hints[0].id);
+            UnityEngine.Object.DestroyImmediate(so);
         }
     }
 

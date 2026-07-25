@@ -1,27 +1,38 @@
 using UnityEngine;
 using RevealGame.Data;
+using RevealGame.Importing;
 
 namespace RevealGame.UI
 {
     public class GameInitializer : MonoBehaviour
     {
+        [SerializeField] private GameConfigSO _configSO;
         [SerializeField] private GameConfig _testConfig;
+
+        [Header("Dependencies")]
+        [SerializeField] private GameManager _gameManager;
 
         private void Start()
         {
-            var manager = FindAnyObjectByType<GameManager>();
-            if (manager == null)
+            if (_gameManager == null)
             {
-                Debug.LogError("[GameInitializer] GameManager not found");
+                Debug.LogError("[GameInitializer] GameManager not assigned");
                 return;
             }
 
-            // _testConfig may be an empty Unity-serialized instance (not null) even when not set in inspector.
-            // Only use it if it was actually populated with items.
-            var config = (_testConfig != null && _testConfig.items != null && _testConfig.items.Length > 0)
-                ? _testConfig
-                : CreateDefaultConfig();
-            manager.InitializeGame(config);
+            var config = ResolveConfig();
+            _gameManager.InitializeGame(config);
+        }
+
+        private GameConfig ResolveConfig()
+        {
+            if (_configSO != null)
+                return ScriptableObjectConfigAdapter.ToGameConfig(_configSO);
+
+            if (_testConfig != null && _testConfig.items != null && _testConfig.items.Length > 0)
+                return _testConfig;
+
+            return CreateDefaultConfig();
         }
 
         private static GameConfig CreateDefaultConfig()

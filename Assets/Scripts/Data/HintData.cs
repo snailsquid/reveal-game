@@ -1,10 +1,8 @@
 using System;
+using UnityEngine;
 
 namespace RevealGame.Data
 {
-    /// <summary>
-    /// Types of hint puzzles a player can solve.
-    /// </summary>
     public enum HintType
     {
         Image = 0,
@@ -13,22 +11,20 @@ namespace RevealGame.Data
         Video = 3
     }
 
-    /// <summary>
-    /// Data model for a hint puzzle.
-    /// </summary>
     [Serializable]
     public class HintData
     {
-        public string id; // Unique identifier
-        public string title; // Display title for the hint
-        public HintType hintType; // Type of hint (image, text, audio, video)
-        public string answer; // Correct answer (exact match)
-        public bool isCaseSensitive; // Whether answer matching is case-sensitive
-        public string[] mediaPaths; // Paths to media files (images, videos, audio)
+        public string id;
+        public string title;
+        public HintType hintType;
+        public string answer;
+        public bool isCaseSensitive;
+        public string[] mediaPaths;
 
-        /// <summary>
-        /// Checks if the player's answer is correct.
-        /// </summary>
+        [NonSerialized] public Sprite[] sprites;
+
+        public bool HasDirectMedia => sprites != null && sprites.Length > 0;
+
         public bool IsAnswerCorrect(string playerAnswer)
         {
             if (string.IsNullOrEmpty(playerAnswer))

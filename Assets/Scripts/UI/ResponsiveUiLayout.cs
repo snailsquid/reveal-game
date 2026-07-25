@@ -11,14 +11,18 @@ namespace RevealGame.UI
         private const float HorizontalPadding = 32f;
         private const float CellSpacing = 20f;
 
-        private CanvasScaler _canvasScaler;
+        [Header("References")]
+        [SerializeField] private CanvasScaler _canvasScaler;
+        [SerializeField] private RectTransform _lootboxGridRect;
+
         private GridLayoutGroup _lootboxGrid;
-        private RectTransform _lootboxGridRect;
         private Vector2 _lastScreenSize;
 
         private void Awake()
         {
-            _canvasScaler = FindAnyObjectByType<CanvasScaler>();
+            if (_lootboxGridRect != null)
+                _lootboxGrid = _lootboxGridRect.GetComponent<GridLayoutGroup>();
+
             ConfigureCanvas();
             RefreshLayout();
         }
@@ -35,7 +39,7 @@ namespace RevealGame.UI
             _lastScreenSize = new Vector2(Screen.width, Screen.height);
             ConfigureCanvas();
 
-            if (!TryFindLootboxGrid())
+            if (_lootboxGrid == null || _lootboxGridRect == null)
                 return;
 
             float width = _lootboxGridRect.rect.width;
@@ -63,24 +67,6 @@ namespace RevealGame.UI
             _canvasScaler.referenceResolution = new Vector2(ReferenceWidth, ReferenceHeight);
             _canvasScaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             _canvasScaler.matchWidthOrHeight = Screen.width < Screen.height ? 1f : 0.5f;
-        }
-
-        private bool TryFindLootboxGrid()
-        {
-            if (_lootboxGrid != null && _lootboxGridRect != null)
-                return true;
-
-            var screen = FindAnyObjectByType<LootboxScreenController>();
-            if (screen == null)
-                return false;
-
-            var grid = screen.transform.Find("LootboxGrid");
-            if (grid == null)
-                return false;
-
-            _lootboxGrid = grid.GetComponent<GridLayoutGroup>();
-            _lootboxGridRect = grid.GetComponent<RectTransform>();
-            return _lootboxGrid != null && _lootboxGridRect != null;
         }
     }
 }
