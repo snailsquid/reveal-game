@@ -24,6 +24,7 @@ namespace RevealGame.UI
         private readonly RectTransform _viewport;
         private readonly Image _selectionMarker;
         private readonly List<string> _collectedRewardTitles = new List<string>();
+        private readonly Data.GameSettings _settings;
 
         public LootboxRevealSequence(GameManager gameManager, Text resultText, Transform popupTransform)
         {
@@ -32,6 +33,7 @@ namespace RevealGame.UI
 
             _lootboxEngine = gameManager.LootboxEngine;
             _mediaDisplay = gameManager.MediaDisplay;
+            _settings = gameManager.Session?.Config?.settings;
             _resultText = resultText;
             _allItems = _lootboxEngine.GetAllItems();
             _viewport = CreateViewport(popupTransform ?? throw new ArgumentNullException(nameof(popupTransform)));
@@ -58,7 +60,9 @@ namespace RevealGame.UI
             var rewardTitle = GetDisplayTitle(rewardItemId, reward?.title);
 
             BuildReel(rewardIndex, reward);
-            SetText($"Reward {rewardIndex + 1} of {rewardCount}\nSpinning...");
+            SetText(_settings != null
+                ? _settings.FormatRewardSpinning(rewardIndex + 1, rewardCount)
+                : Data.GameSettings.DefaultRewardSpinningFormat);
             yield return ScrollReel();
 
             yield return new WaitForSecondsRealtime(LandingHoldDuration);
@@ -146,9 +150,11 @@ namespace RevealGame.UI
             }
         }
 
-        private static string BuildRewardText(int rewardIndex, int rewardCount, string rewardTitle)
+        private string BuildRewardText(int rewardIndex, int rewardCount, string rewardTitle)
         {
-            return $"Reward {rewardIndex + 1} of {rewardCount}\n{rewardTitle}";
+            return _settings != null
+                ? _settings.FormatRewardRevealed(rewardIndex + 1, rewardCount, rewardTitle)
+                : Data.GameSettings.DefaultRewardRevealedFormat;
         }
 
         private static string GetDisplayTitle(string fallback, string title)

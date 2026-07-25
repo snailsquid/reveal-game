@@ -9,11 +9,35 @@ namespace RevealGame.Data
     {
         [SerializeField] private int _nLootbox = 1;
         [SerializeField] private string _correctAnswerFormat = GameSettings.DefaultCorrectAnswerFormat;
+        [SerializeField] private string _defaultHintTitleFormat = GameSettings.DefaultDefaultHintTitleFormat;
+        [SerializeField] private string _openLootboxButtonLabelFormat = GameSettings.DefaultOpenLootboxButtonLabelFormat;
+        [SerializeField] private string _backToLootboxesButtonLabelFormat = GameSettings.DefaultBackToLootboxesButtonLabelFormat;
+        [SerializeField] private string _backButtonLabelFormat = GameSettings.DefaultBackButtonLabelFormat;
+        [SerializeField] private string _lootboxOpenFailedFormat = GameSettings.DefaultLootboxOpenFailedFormat;
+        [SerializeField] private string _lootboxOpenedNoPrizesFormat = GameSettings.DefaultLootboxOpenedNoPrizesFormat;
+        [SerializeField] private string _lootboxOpenedWithPrizesFormat = GameSettings.DefaultLootboxOpenedWithPrizesFormat;
+        [SerializeField] private string _rewardSpinningFormat = GameSettings.DefaultRewardSpinningFormat;
+        [SerializeField] private string _rewardRevealedFormat = GameSettings.DefaultRewardRevealedFormat;
+        [SerializeField] private string _lootboxLabelFormat = GameSettings.DefaultLootboxLabelFormat;
+        [SerializeField] private string _openedNoPrizeFormat = GameSettings.DefaultOpenedNoPrizeFormat;
+        [SerializeField] private string _discordUnavailableFormat = GameSettings.DefaultDiscordUnavailableFormat;
         [SerializeField] private ItemEntry[] _items = Array.Empty<ItemEntry>();
         [SerializeField] private HintEntry[] _hints = Array.Empty<HintEntry>();
 
         public int NLootbox => _nLootbox;
         public string CorrectAnswerFormat => _correctAnswerFormat;
+        public string DefaultHintTitleFormat => _defaultHintTitleFormat;
+        public string OpenLootboxButtonLabelFormat => _openLootboxButtonLabelFormat;
+        public string BackToLootboxesButtonLabelFormat => _backToLootboxesButtonLabelFormat;
+        public string BackButtonLabelFormat => _backButtonLabelFormat;
+        public string LootboxOpenFailedFormat => _lootboxOpenFailedFormat;
+        public string LootboxOpenedNoPrizesFormat => _lootboxOpenedNoPrizesFormat;
+        public string LootboxOpenedWithPrizesFormat => _lootboxOpenedWithPrizesFormat;
+        public string RewardSpinningFormat => _rewardSpinningFormat;
+        public string RewardRevealedFormat => _rewardRevealedFormat;
+        public string LootboxLabelFormat => _lootboxLabelFormat;
+        public string OpenedNoPrizeFormat => _openedNoPrizeFormat;
+        public string DiscordUnavailableFormat => _discordUnavailableFormat;
         public ItemEntry[] Items => _items;
         public HintEntry[] Hints => _hints;
 

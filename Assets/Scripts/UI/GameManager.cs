@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 using RevealGame.Data;
 using RevealGame.Gameplay;
 
@@ -21,6 +22,7 @@ namespace RevealGame.UI
         [Header("Dependencies")]
         [SerializeField] private MediaDisplayController _mediaDisplay;
         [SerializeField] private Image _botStatusImage;
+        [SerializeField] private TMP_Text _botStatusText;
 
         [Header("Discord Answer Server")]
         [SerializeField] private string _discordServerUrl = "http:" + "/" + "/localhost:3000";
@@ -37,6 +39,7 @@ namespace RevealGame.UI
         private ILootboxOpeningStrategy _openingStrategy;
         private bool _enginesInitialized;
         private DiscordAnswerListener _discordAnswerListener;
+        private Coroutine _botStatusRefreshRoutine;
 
         // Public accessors - lazily create engines after config is set
         public LootboxEngine LootboxEngine
@@ -58,6 +61,7 @@ namespace RevealGame.UI
         public GameSession Session => _session;
         public MediaDisplayController MediaDisplay => _mediaDisplay;
         public DiscordAnswerListener DiscordAnswerListener => _discordAnswerListener;
+        public DiscordListenerProcessLauncher DiscordListenerProcessLauncher => _discordListenerProcessLauncher;
 
         private void Awake()
         {
@@ -82,6 +86,7 @@ namespace RevealGame.UI
                 _discordSessionPollInterval);
             _discordAnswerListener.StatusChanged += UpdateBotStatusImage;
             UpdateBotStatusImage();
+            _botStatusRefreshRoutine = StartCoroutine(RefreshBotStatus());
 
             if (GetComponent<ResponsiveUiLayout>() == null)
                 gameObject.AddComponent<ResponsiveUiLayout>();
@@ -89,19 +94,46 @@ namespace RevealGame.UI
 
         private void UpdateBotStatusImage()
         {
-            if (_botStatusImage == null)
+            if (_botStatusImage != null)
+            {
+                if (_discordAnswerListener == null || !_discordAnswerListener.IsBackendConnected)
+                    _botStatusImage.color = Color.red;
+                else if (!_discordAnswerListener.IsChannelVisible)
+                    _botStatusImage.color = Color.yellow;
+                else
+                    _botStatusImage.color = Color.green;
+            }
+
+            if (_botStatusText == null)
                 return;
 
-            if (_discordAnswerListener == null || !_discordAnswerListener.IsBackendConnected)
-                _botStatusImage.color = Color.red;
-            else if (!_discordAnswerListener.IsChannelVisible)
-                _botStatusImage.color = Color.yellow;
-            else
-                _botStatusImage.color = Color.green;
+            if (_discordAnswerListener == null)
+            {
+                _botStatusText.text = _session?.Config?.settings?.FormatDiscordUnavailable() ?? Data.GameSettings.DefaultDiscordUnavailableFormat;
+                _botStatusText.color = new Color(1f, 0.54f, 0.54f);
+                return;
+            }
+
+            _botStatusText.text = _discordAnswerListener.StatusMessage;
+            _botStatusText.color = _discordAnswerListener.IsBackendConnected
+                ? _discordAnswerListener.IsListening ? new Color(0.22f, 0.85f, 0.59f) : Color.white
+                : new Color(1f, 0.54f, 0.54f);
+        }
+
+        private System.Collections.IEnumerator RefreshBotStatus()
+        {
+            var delay = new WaitForSecondsRealtime(0.25f);
+            while (true)
+            {
+                UpdateBotStatusImage();
+                yield return delay;
+            }
         }
 
         private void OnDestroy()
         {
+            if (_botStatusRefreshRoutine != null)
+                StopCoroutine(_botStatusRefreshRoutine);
             if (_discordAnswerListener != null)
                 _discordAnswerListener.StatusChanged -= UpdateBotStatusImage;
         }
@@ -208,6 +240,11 @@ namespace RevealGame.UI
             _session.Initialize(config);
             _enginesInitialized = false;
             Debug.Log("[GameManager] Game initialized with config");
+        }
+
+        public void RestartDiscordListener()
+        {
+            _discordListenerProcessLauncher?.RestartListener();
         }
 
         public void SetOpeningStrategy(ILootboxOpeningStrategy strategy)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using UnityEngine;
@@ -10,15 +11,31 @@ namespace RevealGame.UI
         [SerializeField] private bool _autoStart = true;
         [SerializeField] private string _listenerDirectory;
         [SerializeField] private string _nodeExecutable = "node";
+        [SerializeField, Min(1f)] private float _restartDelay = 3f;
+        [SerializeField] private int _maxRestartAttempts = 5;
 
         private Process _listenerProcess;
         private bool _startedByThisComponent;
+        private bool _intentionalStop;
+        private Coroutine _restartCoroutine;
+
+        private string _lastApiKey;
+        private string _lastServerUrl;
+        private string[] _lastChannelIds;
+        private int _restartAttempts;
 
         public bool IsRunning => _listenerProcess != null && !_listenerProcess.HasExited;
+
+        public event Action ListenerCrashed;
 
         public void StartListener(string gameApiKey, string serverUrl, string[] channelIds)
         {
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+            _lastApiKey = gameApiKey;
+            _lastServerUrl = serverUrl;
+            _lastChannelIds = channelIds;
+            _intentionalStop = false;
+
             if (!_autoStart || !IsLocalUrl(serverUrl) || IsRunning)
                 return;
 
@@ -71,6 +88,7 @@ namespace RevealGame.UI
                 }
 
                 _startedByThisComponent = true;
+                _restartAttempts = 0;
                 _listenerProcess.BeginOutputReadLine();
                 _listenerProcess.BeginErrorReadLine();
                 UnityEngine.Debug.Log($"[DiscordListenerProcessLauncher] Started local listener using {nodeExecutable}.");
@@ -85,9 +103,27 @@ namespace RevealGame.UI
 #endif
         }
 
+        public void RestartListener()
+        {
+#if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+            StopListenerInternal();
+            _intentionalStop = false;
+            _restartAttempts = 0;
+            StartListener(_lastApiKey, _lastServerUrl, _lastChannelIds);
+#endif
+        }
+
         public void StopListener()
         {
 #if UNITY_EDITOR || UNITY_STANDALONE_WIN || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+            _intentionalStop = true;
+            CancelRestart();
+            StopListenerInternal();
+#endif
+        }
+
+        private void StopListenerInternal()
+        {
             if (!_startedByThisComponent || _listenerProcess == null)
                 return;
 
@@ -107,7 +143,6 @@ namespace RevealGame.UI
             {
                 DisposeProcess();
             }
-#endif
         }
 
         private void OnApplicationQuit()
@@ -182,8 +217,46 @@ namespace RevealGame.UI
 
         private void OnListenerExited(object sender, EventArgs args)
         {
-            UnityEngine.Debug.LogWarning("[DiscordListenerProcessLauncher] Local listener exited.");
             DisposeProcess();
+
+            if (_intentionalStop)
+                return;
+
+            UnityEngine.Debug.LogWarning("[DiscordListenerProcessLauncher] Local listener exited unexpectedly.");
+            ListenerCrashed?.Invoke();
+            ScheduleRestart();
+        }
+
+        private void ScheduleRestart()
+        {
+            if (_restartAttempts >= _maxRestartAttempts)
+            {
+                UnityEngine.Debug.LogError($"[DiscordListenerProcessLauncher] Max restart attempts ({_maxRestartAttempts}) reached. Use RestartListener() to retry manually.");
+                return;
+            }
+
+            _restartAttempts++;
+            CancelRestart();
+            _restartCoroutine = StartCoroutine(RestartAfterDelay());
+        }
+
+        private IEnumerator RestartAfterDelay()
+        {
+            UnityEngine.Debug.Log($"[DiscordListenerProcessLauncher] Restarting listener in {_restartDelay}s (attempt {_restartAttempts}/{_maxRestartAttempts})...");
+            yield return new WaitForSecondsRealtime(_restartDelay);
+            _restartCoroutine = null;
+
+            if (!_intentionalStop && !IsRunning)
+                StartListener(_lastApiKey, _lastServerUrl, _lastChannelIds);
+        }
+
+        private void CancelRestart()
+        {
+            if (_restartCoroutine != null)
+            {
+                StopCoroutine(_restartCoroutine);
+                _restartCoroutine = null;
+            }
         }
 
         private void DisposeProcess()

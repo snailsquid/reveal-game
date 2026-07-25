@@ -1,7 +1,9 @@
 {
     "name": "RevealGame",
     "rootNamespace": "RevealGame",
-    "references": [],
+    "references": [
+        "Unity.TextMeshPro"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

@@ -76,7 +76,11 @@ namespace RevealGame.UI
                     ctrl = go.AddComponent<LootboxButtonController>();
 
                 bool isOpened = _gameManager.LootboxEngine.IsLootboxOpened(i);
-                ctrl.Setup(i, isOpened, OnLootboxClicked);
+                var settings = _gameManager.Session?.Config?.settings;
+                var labelText = settings != null
+                    ? settings.FormatLootboxLabel(i + 1)
+                    : Data.GameSettings.DefaultLootboxLabelFormat;
+                ctrl.Setup(i, isOpened, OnLootboxClicked, labelText);
                 if (isOpened)
                 {
                     var winners = _gameManager.LootboxEngine.GetAllLootboxStates()[i].winnerItemIds;
@@ -89,7 +93,12 @@ namespace RevealGame.UI
         private string BuildWinnerText(List<string> winnerItemIds)
         {
             if (winnerItemIds == null || winnerItemIds.Count == 0)
-                return "Opened\nNo prize";
+            {
+                var settings = _gameManager.Session?.Config?.settings;
+                return settings != null
+                    ? settings.FormatOpenedNoPrize()
+                    : Data.GameSettings.DefaultOpenedNoPrizeFormat;
+            }
 
             var titles = new List<string>();
             foreach (var itemId in winnerItemIds)

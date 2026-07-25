@@ -17,7 +17,23 @@ namespace RevealGame.Importing
 
             var config = new GameConfig
             {
-                settings = new GameSettings { nLootbox = so.NLootbox, correctAnswerFormat = so.CorrectAnswerFormat },
+                settings = new GameSettings
+                {
+                    nLootbox = so.NLootbox,
+                    correctAnswerFormat = so.CorrectAnswerFormat,
+                    defaultHintTitleFormat = so.DefaultHintTitleFormat,
+                    openLootboxButtonLabelFormat = so.OpenLootboxButtonLabelFormat,
+                    backToLootboxesButtonLabelFormat = so.BackToLootboxesButtonLabelFormat,
+                    backButtonLabelFormat = so.BackButtonLabelFormat,
+                    lootboxOpenFailedFormat = so.LootboxOpenFailedFormat,
+                    lootboxOpenedNoPrizesFormat = so.LootboxOpenedNoPrizesFormat,
+                    lootboxOpenedWithPrizesFormat = so.LootboxOpenedWithPrizesFormat,
+                    rewardSpinningFormat = so.RewardSpinningFormat,
+                    rewardRevealedFormat = so.RewardRevealedFormat,
+                    lootboxLabelFormat = so.LootboxLabelFormat,
+                    openedNoPrizeFormat = so.OpenedNoPrizeFormat,
+                    discordUnavailableFormat = so.DiscordUnavailableFormat
+                },
                 items = so.Items.Select((entry, i) => ToItemData(entry, i)).ToArray(),
                 hints = so.Hints.Select((entry, i) => ToHintData(entry, i)).ToArray()
             };

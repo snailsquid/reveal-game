@@ -13,6 +13,35 @@ MonoBehaviour:
   m_Name: Top20
   m_EditorClassIdentifier: RevealGame::RevealGame.Data.GameConfigSO
   _nLootbox: 1
+  _correctAnswerFormat: '{user} guessed the correct answer:
+
+    ''{answer}'''
+  _defaultHintTitleFormat: Solve the puzzle!
+  _openLootboxButtonLabelFormat: Open Lootbox
+  _backToLootboxesButtonLabelFormat: Back to Lootboxes
+  _backButtonLabelFormat: Back
+  _lootboxOpenFailedFormat: The lootbox could not be opened.
+  _lootboxOpenedNoPrizesFormat: 'Lootbox opened
+
+
+    No prizes this time.'
+  _lootboxOpenedWithPrizesFormat: 'Lootbox opened
+
+
+    You unlocked {count} item(s):
+
+    {items}'
+  _rewardSpinningFormat: 'Reward {index} of {count}
+
+    Spinning...'
+  _rewardRevealedFormat: 'Reward {index} of {count}
+
+    {title}'
+  _lootboxLabelFormat: Box {index}
+  _openedNoPrizeFormat: 'Opened
+
+    No prize'
+  _discordUnavailableFormat: Discord server unavailable.
   _items:
   - title: Paper Plane Shooter
     description: 'Paper Plane Shooter is inspired by childhood memories from my school
@@ -28,7 +57,7 @@ MonoBehaviour:
       progress, and the presentation are probably 10 minutes left until the end. '
     image: {fileID: 3542890154450382275, guid: 894bd1d56e63bcd9b90039a3eec23627, type: 3}
     video: {fileID: 0}
-    isWinner: 0
+    isWinner: 1
   _hints:
   - title: Game Apa Ini?
     hintType: 0

@@ -27,14 +27,14 @@ namespace RevealGame.UI
         /// <summary>
         /// Configures this button for a lootbox at the given index.
         /// </summary>
-        public void Setup(int index, bool isOpened, Action<int> onClick)
+        public void Setup(int index, bool isOpened, Action<int> onClick, string labelText)
         {
             _index = index;
             _onClick = onClick;
 
             if (_indexLabel != null)
             {
-                _indexLabel.text = $"Box {index + 1}";
+                _indexLabel.text = labelText;
                 _indexLabel.color = new Color(0.08f, 0.16f, 0.25f);
             }
             if (_button != null) _button.interactable = !isOpened;
