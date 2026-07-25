@@ -217,7 +217,7 @@ namespace RevealGame.UI
             _gameManager.DiscordAnswerListener?.StopListening();
             if (_resultPopup != null && _resultText != null)
             {
-                _resultText.text = $"Discord Answered Correctly\n{match.Username}\n'{match.Guess}'";
+                _resultText.text = _gameManager.Session.Config.settings.FormatCorrectAnswer(match.Username, match.Guess);
                 ConfigureResultPopup();
                 _resultPopup.SetActive(true);
             }

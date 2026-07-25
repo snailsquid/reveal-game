@@ -8,10 +8,12 @@ namespace RevealGame.Data
     public class GameConfigSO : ScriptableObject
     {
         [SerializeField] private int _nLootbox = 1;
+        [SerializeField] private string _correctAnswerFormat = GameSettings.DefaultCorrectAnswerFormat;
         [SerializeField] private ItemEntry[] _items = Array.Empty<ItemEntry>();
         [SerializeField] private HintEntry[] _hints = Array.Empty<HintEntry>();
 
         public int NLootbox => _nLootbox;
+        public string CorrectAnswerFormat => _correctAnswerFormat;
         public ItemEntry[] Items => _items;
         public HintEntry[] Hints => _hints;
 

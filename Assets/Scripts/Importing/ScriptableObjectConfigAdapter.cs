@@ -17,7 +17,7 @@ namespace RevealGame.Importing
 
             var config = new GameConfig
             {
-                settings = new GameSettings { nLootbox = so.NLootbox },
+                settings = new GameSettings { nLootbox = so.NLootbox, correctAnswerFormat = so.CorrectAnswerFormat },
                 items = so.Items.Select((entry, i) => ToItemData(entry, i)).ToArray(),
                 hints = so.Hints.Select((entry, i) => ToHintData(entry, i)).ToArray()
             };

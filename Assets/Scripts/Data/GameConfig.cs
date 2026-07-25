@@ -20,6 +20,15 @@ namespace RevealGame.Data
     [Serializable]
     public class GameSettings
     {
-        public int nLootbox; // Number of lootboxes
+        public const string DefaultCorrectAnswerFormat = "{user} guessed the correct answer:\n'{answer}'";
+
+        public int nLootbox;
+        public string correctAnswerFormat = DefaultCorrectAnswerFormat;
+
+        public string FormatCorrectAnswer(string user, string answer)
+        {
+            var format = string.IsNullOrEmpty(correctAnswerFormat) ? DefaultCorrectAnswerFormat : correctAnswerFormat;
+            return format.Replace("{user}", user ?? "").Replace("{answer}", answer ?? "");
+        }
     }
 }

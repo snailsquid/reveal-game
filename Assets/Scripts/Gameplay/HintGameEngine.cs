@@ -88,7 +88,7 @@ namespace RevealGame.Gameplay
                 IsCorrect = isCorrect,
                 Hint = hint,
                 Message = isCorrect
-                    ? $"Player Answered Correctly\n'{playerAnswer}'"
+                    ? _session.Config.settings.FormatCorrectAnswer("Player", playerAnswer)
                     : "Incorrect answer. Try again."
             };
         }

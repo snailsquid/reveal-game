@@ -13,5 +13,26 @@ MonoBehaviour:
   m_Name: Top20
   m_EditorClassIdentifier: RevealGame::RevealGame.Data.GameConfigSO
   _nLootbox: 1
-  _items: []
-  _hints: []
+  _items:
+  - title: Paper Plane Shooter
+    description: 'Paper Plane Shooter is inspired by childhood memories from my school
+      days. During recess, my friends and I often made paper airplanes and spent
+      time flying them together. Those simple moments of creativity, imagination,
+      and fun left a lasting impression on me. '
+    image: {fileID: 1411070990185071134, guid: 3b5930cc7f8a015a4982a3d045bc67cc, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: Slam it, Slam!
+    description: 'A game about you become Slamet, a junior developer in small studio.
+      Slamet and team are have a meeting with publishers to present a game development
+      progress, and the presentation are probably 10 minutes left until the end. '
+    image: {fileID: 3542890154450382275, guid: 894bd1d56e63bcd9b90039a3eec23627, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  _hints:
+  - title: Game Apa Ini?
+    hintType: 0
+    answer: GTA V
+    isCaseSensitive: 0
+    images:
+    - {fileID: 8957324059118975939, guid: 718654fcbc2c2a81ebad5d25e97697dd, type: 3}
