@@ -18,7 +18,6 @@ namespace RevealGame.UI
         [SerializeField] private Text _resultText;
         [SerializeField] private Button _continueButton;
         [SerializeField] private Button _backButton;
-        [SerializeField] private Text _discordStatusText;
 
         [Header("Dependencies")]
         [SerializeField] private GameManager _gameManager;
@@ -27,7 +26,8 @@ namespace RevealGame.UI
         private int _currentHintImageIndex;
         private int _currentHintImageCount;
         private Coroutine _matchedAnswerRoutine;
-        private Coroutine _discordStatusRefreshRoutine;
+
+        private Data.GameSettings Settings => _gameManager?.Session?.Config?.settings;
 
         private enum OpeningState
         {
@@ -41,7 +41,6 @@ namespace RevealGame.UI
             if (_submitButton != null)
                 SetButtonLabelColor(_submitButton, new Color(0.08f, 0.16f, 0.12f));
 
-            EnsureHintImageCarouselControls();
             if (_previousHintImageButton != null)
                 _previousHintImageButton.onClick.AddListener(ShowPreviousHintImage);
             if (_nextHintImageButton != null)
@@ -51,11 +50,9 @@ namespace RevealGame.UI
             {
                 _continueButton.onClick.AddListener(OnContinue);
                 var label = _continueButton.GetComponentInChildren<Text>(true);
-                if (label != null) label.text = "Open Lootbox";
+                if (label != null) label.text = Settings?.FormatOpenLootboxButtonLabel() ?? Data.GameSettings.DefaultOpenLootboxButtonLabelFormat;
             }
 
-            EnsureBackButton();
-            EnsureDiscordStatusText();
             if (_backButton != null)
                 _backButton.onClick.AddListener(OnBackClicked);
 
@@ -68,7 +65,7 @@ namespace RevealGame.UI
             SubscribeToDiscordListener();
             _openingState = OpeningState.AwaitingStart;
             SetHintControlsVisible(true);
-            SetContinueButtonLabel("Open Lootbox");
+            SetContinueButtonLabel(Settings?.FormatOpenLootboxButtonLabel() ?? Data.GameSettings.DefaultOpenLootboxButtonLabelFormat);
 
             if (_submitButton != null)
                 _submitButton.interactable = true;
@@ -78,19 +75,10 @@ namespace RevealGame.UI
 
             if (_resultPopup != null)
                 _resultPopup.SetActive(false);
-
-            UpdateDiscordStatus();
-            _discordStatusRefreshRoutine = StartCoroutine(RefreshDiscordStatus());
         }
 
         private void OnDisable()
         {
-            if (_discordStatusRefreshRoutine != null)
-            {
-                StopCoroutine(_discordStatusRefreshRoutine);
-                _discordStatusRefreshRoutine = null;
-            }
-
             UnsubscribeFromDiscordListener();
             _gameManager?.DiscordAnswerListener?.StopListening();
         }
@@ -107,7 +95,7 @@ namespace RevealGame.UI
             }
 
             if (_hintTitleText != null)
-                _hintTitleText.text = string.IsNullOrEmpty(hint.title) ? "Solve the puzzle!" : hint.title;
+                _hintTitleText.text = string.IsNullOrEmpty(hint.title) ? (Settings?.FormatDefaultHintTitle() ?? Data.GameSettings.DefaultDefaultHintTitleFormat) : hint.title;
 
             _currentHintImageCount = _gameManager.MediaDisplay?.GetHintMediaCount(hint) ?? 0;
             _currentHintImageIndex = 0;
@@ -115,7 +103,6 @@ namespace RevealGame.UI
             UpdateHintImageCarouselControls();
 
             _gameManager.DiscordAnswerListener?.BeginListening(hint);
-            UpdateDiscordStatus();
         }
 
         private void ShowPreviousHintImage()
@@ -209,7 +196,6 @@ namespace RevealGame.UI
             if (!result.IsCorrect)
             {
                 Debug.LogWarning("[HintGameUIController] Discord server returned an answer that does not match the active hint.");
-                UpdateDiscordStatus();
                 return;
             }
 
@@ -259,17 +245,17 @@ namespace RevealGame.UI
             _openingState = OpeningState.AwaitingExit;
             _continueButton.gameObject.SetActive(true);
             _continueButton.interactable = true;
-            SetContinueButtonLabel("Back to Lootboxes");
+            SetContinueButtonLabel(Settings?.FormatBackToLootboxesButtonLabel() ?? Data.GameSettings.DefaultBackToLootboxesButtonLabelFormat);
         }
 
         private void ShowOpeningFailure()
         {
             if (_resultText != null)
-                _resultText.text = "The lootbox could not be opened.";
+                _resultText.text = Settings?.FormatLootboxOpenFailed() ?? Data.GameSettings.DefaultLootboxOpenFailedFormat;
 
             _openingState = OpeningState.AwaitingExit;
             _continueButton.interactable = true;
-            SetContinueButtonLabel("Back to Lootboxes");
+            SetContinueButtonLabel(Settings?.FormatBackToLootboxesButtonLabel() ?? Data.GameSettings.DefaultBackToLootboxesButtonLabelFormat);
         }
 
         private void ShowRewardSummary(System.Collections.Generic.IReadOnlyList<string> collectedRewardTitles)
@@ -278,8 +264,8 @@ namespace RevealGame.UI
             {
                 SetResultTextArea(0.25f);
                 _resultText.text = collectedRewardTitles.Count == 0
-                    ? "Lootbox opened\n\nNo prizes this time."
-                    : $"Lootbox opened\n\nYou unlocked {collectedRewardTitles.Count} item(s):\n{string.Join("\n", collectedRewardTitles)}";
+                    ? (Settings?.FormatLootboxOpenedNoPrizes() ?? Data.GameSettings.DefaultLootboxOpenedNoPrizesFormat)
+                    : (Settings?.FormatLootboxOpenedWithPrizes(collectedRewardTitles.Count, collectedRewardTitles) ?? Data.GameSettings.DefaultLootboxOpenedWithPrizesFormat);
             }
         }
 
@@ -360,108 +346,12 @@ namespace RevealGame.UI
             if (_hintImagePaginationText != null) _hintImagePaginationText.gameObject.SetActive(visible);
         }
 
-        private void EnsureHintImageCarouselControls()
-        {
-            if (_submitButton == null)
-                return;
-
-            if (_previousHintImageButton == null)
-                _previousHintImageButton = CreateHintImageNavigationButton("PreviousHintImageButton", "<", new Vector2(0.30f, 0.70f));
-            if (_nextHintImageButton == null)
-                _nextHintImageButton = CreateHintImageNavigationButton("NextHintImageButton", ">", new Vector2(0.70f, 0.70f));
-
-            if (_hintImagePaginationText != null)
-                return;
-
-            var paginationObject = new GameObject("HintImagePaginationText", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
-            paginationObject.transform.SetParent(transform, false);
-            var paginationRect = paginationObject.GetComponent<RectTransform>();
-            paginationRect.anchorMin = new Vector2(0.42f, 0.52f);
-            paginationRect.anchorMax = new Vector2(0.58f, 0.55f);
-            paginationRect.offsetMin = Vector2.zero;
-            paginationRect.offsetMax = Vector2.zero;
-
-            _hintImagePaginationText = paginationObject.GetComponent<Text>();
-            _hintImagePaginationText.font = _hintTitleText != null
-                ? _hintTitleText.font
-                : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            _hintImagePaginationText.fontSize = 16;
-            _hintImagePaginationText.color = Color.white;
-            _hintImagePaginationText.alignment = TextAnchor.MiddleCenter;
-        }
-
-        private Button CreateHintImageNavigationButton(string name, string labelText, Vector2 anchor)
-        {
-            var buttonObject = Instantiate(_submitButton.gameObject, transform);
-            buttonObject.name = name;
-            var button = buttonObject.GetComponent<Button>();
-            button.onClick.RemoveAllListeners();
-
-            var buttonRect = buttonObject.GetComponent<RectTransform>();
-            buttonRect.anchorMin = anchor;
-            buttonRect.anchorMax = anchor;
-            buttonRect.anchoredPosition = Vector2.zero;
-            buttonRect.sizeDelta = new Vector2(48f, 48f);
-
-            var label = button.GetComponentInChildren<Text>(true);
-            if (label != null)
-            {
-                label.text = labelText;
-                label.fontSize = 28;
-            }
-
-            return button;
-        }
-
-        private void EnsureBackButton()
-        {
-            if (_backButton != null || _submitButton == null)
-                return;
-
-            var backObject = Instantiate(_submitButton.gameObject, transform);
-            backObject.name = "BackButton";
-            _backButton = backObject.GetComponent<Button>();
-            _backButton.onClick.RemoveAllListeners();
-
-            var backRect = backObject.GetComponent<RectTransform>();
-            backRect.anchorMin = new Vector2(0.04f, 0.9f);
-            backRect.anchorMax = new Vector2(0.23f, 0.97f);
-            backRect.offsetMin = Vector2.zero;
-            backRect.offsetMax = Vector2.zero;
-
-            var label = _backButton.GetComponentInChildren<Text>(true);
-            if (label != null)
-                label.text = "Back";
-        }
-
-        private void EnsureDiscordStatusText()
-        {
-            if (_discordStatusText != null)
-                return;
-
-            var statusObject = new GameObject("DiscordStatusText", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
-            statusObject.transform.SetParent(transform, false);
-            var statusRect = statusObject.GetComponent<RectTransform>();
-            statusRect.anchorMin = new Vector2(0.25f, 0.90f);
-            statusRect.anchorMax = new Vector2(0.95f, 0.97f);
-            statusRect.offsetMin = Vector2.zero;
-            statusRect.offsetMax = Vector2.zero;
-
-            _discordStatusText = statusObject.GetComponent<Text>();
-            _discordStatusText.font = _hintTitleText != null
-                ? _hintTitleText.font
-                : Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-            _discordStatusText.fontSize = Screen.width < Screen.height ? 14 : 16;
-            _discordStatusText.alignment = TextAnchor.MiddleRight;
-        }
-
         private void SubscribeToDiscordListener()
         {
             var listener = _gameManager?.DiscordAnswerListener;
             if (listener == null)
                 return;
 
-            listener.StatusChanged += UpdateDiscordStatus;
             listener.AnswerMatched += OnDiscordAnswerMatched;
         }
 
@@ -471,37 +361,7 @@ namespace RevealGame.UI
             if (listener == null)
                 return;
 
-            listener.StatusChanged -= UpdateDiscordStatus;
             listener.AnswerMatched -= OnDiscordAnswerMatched;
-        }
-
-        private void UpdateDiscordStatus()
-        {
-            if (_discordStatusText == null)
-                return;
-
-            var listener = _gameManager?.DiscordAnswerListener;
-            if (listener == null)
-            {
-                _discordStatusText.text = "Discord server unavailable.";
-                _discordStatusText.color = new Color(1f, 0.54f, 0.54f);
-                return;
-            }
-
-            _discordStatusText.text = listener.StatusMessage;
-            _discordStatusText.color = listener.IsBackendConnected
-                ? listener.IsListening ? new Color(0.22f, 0.85f, 0.59f) : Color.white
-                : new Color(1f, 0.54f, 0.54f);
-        }
-
-        private System.Collections.IEnumerator RefreshDiscordStatus()
-        {
-            var delay = new WaitForSecondsRealtime(0.25f);
-            while (true)
-            {
-                UpdateDiscordStatus();
-                yield return delay;
-            }
         }
     }
 }
