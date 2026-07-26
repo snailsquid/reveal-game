@@ -1,16 +1,15 @@
-using System;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using RevealGame.Data;
 using RevealGame.Gameplay;
 
 namespace RevealGame.UI
 {
     /// <summary>
-    /// Main game orchestrator. Initializes engines, manages screen transitions,
-    /// and coordinates the game flow: Title -> Lootbox Selection -> Hint Game -> Result.
+    /// Main game coordinator. Keeps the public game-flow API used by UI controllers
+    /// while delegating session, navigation, and Discord concerns to focused services.
     /// </summary>
     public class GameManager : MonoBehaviour
     {
@@ -32,202 +31,125 @@ namespace RevealGame.UI
         [SerializeField] private DiscordListenerProcessLauncher _discordListenerProcessLauncher;
         [SerializeField] private string[] _channelIds;
 
-        private GameSession _session;
-        private LootboxEngine _lootboxEngine;
-        private HintGameEngine _hintGameEngine;
-        private readonly LootboxStrategyRegistry _strategyRegistry = new LootboxStrategyRegistry();
-        private ILootboxOpeningStrategy _openingStrategy;
-        private bool _enginesInitialized;
-        private DiscordAnswerListener _discordAnswerListener;
-        private Coroutine _botStatusRefreshRoutine;
+        private GameSessionCoordinator _gameSessionCoordinator;
+        private ScreenNavigator _screenNavigator;
+        private DiscordStatusCoordinator _discordStatusCoordinator;
 
-        // Public accessors - lazily create engines after config is set
-        public LootboxEngine LootboxEngine
-        {
-            get
-            {
-                EnsureEngines();
-                return _lootboxEngine;
-            }
-        }
-        public HintGameEngine HintGameEngine
-        {
-            get
-            {
-                EnsureEngines();
-                return _hintGameEngine;
-            }
-        }
-        public GameSession Session => _session;
+        public LootboxEngine LootboxEngine => _gameSessionCoordinator?.LootboxEngine;
+        public HintGameEngine HintGameEngine => _gameSessionCoordinator?.HintGameEngine;
+        public GameSession Session => _gameSessionCoordinator?.Session;
         public MediaDisplayController MediaDisplay => _mediaDisplay;
-        public DiscordAnswerListener DiscordAnswerListener => _discordAnswerListener;
-        public DiscordListenerProcessLauncher DiscordListenerProcessLauncher => _discordListenerProcessLauncher;
+        public DiscordAnswerListener DiscordAnswerListener => _discordStatusCoordinator?.AnswerListener;
+        public DiscordListenerProcessLauncher DiscordListenerProcessLauncher => _discordStatusCoordinator?.ProcessLauncher;
 
         private void Awake()
         {
-            _session = GameSession.Instance;
-            _openingStrategy = _strategyRegistry.GetRequired(DeclaredWinnersOpeningStrategy.StrategyId);
+            _gameSessionCoordinator = new GameSessionCoordinator();
+            _gameSessionCoordinator.InitializeSession(GameSession.Instance);
 
-            _discordAnswerListener = GetComponent<DiscordAnswerListener>();
-            if (_discordAnswerListener == null)
-                _discordAnswerListener = gameObject.AddComponent<DiscordAnswerListener>();
-
-            if (_discordListenerProcessLauncher == null)
-                _discordListenerProcessLauncher = GetComponent<DiscordListenerProcessLauncher>();
-            if (_discordListenerProcessLauncher == null)
-                _discordListenerProcessLauncher = gameObject.AddComponent<DiscordListenerProcessLauncher>();
-
-            _discordListenerProcessLauncher.StartListener(_discordServerApiKey, _discordServerUrl, _channelIds);
-
-            _discordAnswerListener.Configure(
+            _screenNavigator = new ScreenNavigator(_titleScreen, _lootboxScreen, _hintGameScreen);
+            _discordStatusCoordinator = new DiscordStatusCoordinator(
+                this,
+                Session,
+                _botStatusImage,
+                _botStatusText,
                 _discordServerUrl,
                 _discordServerApiKey,
                 _discordHealthCheckInterval,
-                _discordSessionPollInterval);
-            _discordAnswerListener.StatusChanged += UpdateBotStatusImage;
-            UpdateBotStatusImage();
-            _botStatusRefreshRoutine = StartCoroutine(RefreshBotStatus());
+                _discordSessionPollInterval,
+                _discordListenerProcessLauncher,
+                _channelIds);
+            _discordStatusCoordinator.Initialize();
 
             if (GetComponent<ResponsiveUiLayout>() == null)
                 gameObject.AddComponent<ResponsiveUiLayout>();
         }
 
-        private void UpdateBotStatusImage()
-        {
-            if (_botStatusImage != null)
-            {
-                if (_discordAnswerListener == null || !_discordAnswerListener.IsBackendConnected)
-                    _botStatusImage.color = Color.red;
-                else if (!_discordAnswerListener.IsChannelVisible)
-                    _botStatusImage.color = Color.yellow;
-                else
-                    _botStatusImage.color = Color.green;
-            }
-
-            if (_botStatusText == null)
-                return;
-
-            if (_discordAnswerListener == null)
-            {
-                _botStatusText.text = _session?.Config?.settings?.FormatDiscordUnavailable() ?? Data.GameSettings.DefaultDiscordUnavailableFormat;
-                _botStatusText.color = new Color(1f, 0.54f, 0.54f);
-                return;
-            }
-
-            _botStatusText.text = _discordAnswerListener.StatusMessage;
-            _botStatusText.color = _discordAnswerListener.IsBackendConnected
-                ? _discordAnswerListener.IsListening ? new Color(0.22f, 0.85f, 0.59f) : Color.white
-                : new Color(1f, 0.54f, 0.54f);
-        }
-
-        private System.Collections.IEnumerator RefreshBotStatus()
-        {
-            var delay = new WaitForSecondsRealtime(0.25f);
-            while (true)
-            {
-                UpdateBotStatusImage();
-                yield return delay;
-            }
-        }
-
         private void OnDestroy()
         {
-            if (_botStatusRefreshRoutine != null)
-                StopCoroutine(_botStatusRefreshRoutine);
-            if (_discordAnswerListener != null)
-                _discordAnswerListener.StatusChanged -= UpdateBotStatusImage;
-        }
-
-        private void EnsureEngines()
-        {
-            if (_enginesInitialized && _lootboxEngine != null && _hintGameEngine != null) return;
-            if (_session?.Config == null)
-            {
-                throw new InvalidOperationException("GameManager: GameSession not initialized. Call InitializeGame first.");
-            }
-            _lootboxEngine = new LootboxEngine(_session, _openingStrategy);
-            _hintGameEngine = new HintGameEngine(_session);
-            _enginesInitialized = true;
-        }
-
-        /// <summary>
-        /// Initializes engines after config is set. Called by GameInitializer or manually.
-        /// </summary>
-        public void InitializeEngines()
-        {
-            if (_session?.Config != null)
-            {
-                _lootboxEngine = new LootboxEngine(_session, _openingStrategy);
-                _hintGameEngine = new HintGameEngine(_session);
-                _enginesInitialized = true;
-            }
+            _discordStatusCoordinator?.Dispose();
         }
 
         private void Start()
         {
-            // Start on the title screen
+            EnsureScreenNavigator();
+            _screenNavigator.ResolveScreenReferences(transform.root);
+            SyncScreenReferences();
+
+            if (_mediaDisplay == null)
+                _mediaDisplay = FindAnyObjectByType<MediaDisplayController>();
+
             ShowTitleScreen();
         }
 
-        /// <summary>
-        /// Shows only the title screen, hides all others.
-        /// </summary>
-        public void ShowTitleScreen()
+        private void EnsureScreenNavigator()
         {
-            _discordAnswerListener?.StopListening();
-            _titleScreen.SetActive(true);
-            _lootboxScreen.SetActive(false);
-            _hintGameScreen.SetActive(false);
+            if (_screenNavigator == null)
+                _screenNavigator = new ScreenNavigator(_titleScreen, _lootboxScreen, _hintGameScreen);
+        }
+
+        private void SyncScreenReferences()
+        {
+            _titleScreen = _screenNavigator.TitleScreen;
+            _lootboxScreen = _screenNavigator.LootboxScreen;
+            _hintGameScreen = _screenNavigator.HintGameScreen;
         }
 
         /// <summary>
-        /// Shows the lootbox selection screen. Called after Play on title screen.
+        /// Shows only the title screen, hiding all others.
+        /// </summary>
+        public void ShowTitleScreen()
+        {
+            EnsureScreenNavigator();
+            _discordStatusCoordinator?.StopListening();
+            _screenNavigator.ShowTitleScreen();
+        }
+
+        /// <summary>
+        /// Shows the lootbox selection screen and refreshes its grid.
         /// </summary>
         public void ShowLootboxScreen()
         {
-            _discordAnswerListener?.StopListening();
-            _titleScreen.SetActive(false);
-            _lootboxScreen.SetActive(true);
-            _hintGameScreen.SetActive(false);
+            EnsureScreenNavigator();
+            _discordStatusCoordinator?.StopListening();
+            _screenNavigator.ShowLootboxScreen();
 
-            // Notify the lootbox screen to refresh its grid
-            var controller = _lootboxScreen.GetComponent<LootboxScreenController>();
+            var controller = _screenNavigator.LootboxScreen?.GetComponent<LootboxScreenController>();
             if (controller != null)
                 controller.RefreshGrid();
         }
 
         /// <summary>
-        /// Shows the hint game screen for a selected lootbox.
+        /// Shows the hint game screen for the selected lootbox.
         /// </summary>
         public void ShowHintGameScreen()
         {
-            _titleScreen.SetActive(false);
-            _lootboxScreen.SetActive(false);
-            _hintGameScreen.SetActive(true);
+            EnsureScreenNavigator();
+            _screenNavigator.ShowHintGameScreen();
 
-            _hintGameEngine.GetOrAssignHint();
-            var controller = _hintGameScreen.GetComponent<HintGameUIController>();
+            HintGameEngine.GetOrAssignHint();
+            var controller = _screenNavigator.HintGameScreen?.GetComponent<HintGameUIController>();
             if (controller != null)
                 controller.ShowCurrentHint();
         }
 
         public IReadOnlyList<string> OpenLootboxForReveal()
         {
-            var winners = _lootboxEngine.OpenLootbox();
+            var winners = LootboxEngine.OpenLootbox();
             Debug.Log($"[GameManager] Lootbox opened with {winners.Count} items");
             return winners;
         }
 
         public void CompleteLootboxOpening()
         {
-            _discordAnswerListener?.StopListening();
+            _discordStatusCoordinator?.StopListening();
             ShowLootboxScreen();
         }
 
         public void CancelLootboxOpening()
         {
-            _discordAnswerListener?.StopListening();
-            _session?.ClearCurrentLootboxSelection();
+            _discordStatusCoordinator?.StopListening();
+            Session?.ClearCurrentLootboxSelection();
             ShowLootboxScreen();
         }
 
@@ -237,27 +159,31 @@ namespace RevealGame.UI
         /// </summary>
         public void InitializeGame(GameConfig config)
         {
-            _session.Initialize(config);
-            _enginesInitialized = false;
+            _gameSessionCoordinator.InitializeGame(config);
             Debug.Log("[GameManager] Game initialized with config");
+        }
+
+        /// <summary>
+        /// Initializes gameplay engines after a configuration has been loaded.
+        /// </summary>
+        public void InitializeEngines()
+        {
+            _gameSessionCoordinator.InitializeEngines();
         }
 
         public void RestartDiscordListener()
         {
-            _discordListenerProcessLauncher?.RestartListener();
+            _discordStatusCoordinator?.RestartListener();
         }
 
         public void SetOpeningStrategy(ILootboxOpeningStrategy strategy)
         {
-            _strategyRegistry.Register(strategy);
-            _openingStrategy = _strategyRegistry.GetRequired(strategy.Id);
-            _enginesInitialized = false;
+            _gameSessionCoordinator.SetOpeningStrategy(strategy);
         }
 
         public void SetOpeningStrategy(string strategyId)
         {
-            _openingStrategy = _strategyRegistry.GetRequired(strategyId);
-            _enginesInitialized = false;
+            _gameSessionCoordinator.SetOpeningStrategy(strategyId);
         }
     }
 }

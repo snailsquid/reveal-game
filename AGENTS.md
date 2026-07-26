@@ -7,6 +7,7 @@ This is a unity project for a game with the main goal being to gacha or open cas
 Everything must follow best practices of Unity and C#.
 Make best use of prefabs whenever fitting.
 Always make sure unity compiles
+Verify Unity projects with the Unity Editor or Unity command-line validation, not dotnet.
 
 # Glossary
 
