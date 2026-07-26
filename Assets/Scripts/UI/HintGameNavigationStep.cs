@@ -13,28 +13,20 @@ namespace RevealGame.UI
         [SerializeField] private int _order;
         [SerializeField] private bool _allowPrevious;
         [SerializeField] private bool _useCanvasGroup;
-        [SerializeField] private GameObject _activationTarget;
-
         private CanvasGroup _canvasGroup;
 
         public int Order => _order;
         public bool CanGoPrevious => _allowPrevious;
-        public GameObject ActivationTarget => _activationTarget != null ? _activationTarget : gameObject;
-
-        internal void Configure(int order, bool allowPrevious, bool useCanvasGroup,
-            GameObject activationTarget = null)
+        internal void Configure(int order, bool allowPrevious, bool useCanvasGroup)
         {
             _order = order;
             _allowPrevious = allowPrevious;
             _useCanvasGroup = useCanvasGroup;
-            if (activationTarget != null)
-                _activationTarget = activationTarget;
-
             if (_useCanvasGroup && _canvasGroup == null)
             {
-                _canvasGroup = ActivationTarget.GetComponent<CanvasGroup>();
+                _canvasGroup = GetComponent<CanvasGroup>();
                 if (_canvasGroup == null)
-                    _canvasGroup = ActivationTarget.AddComponent<CanvasGroup>();
+                    _canvasGroup = gameObject.AddComponent<CanvasGroup>();
             }
         }
 
@@ -44,9 +36,9 @@ namespace RevealGame.UI
             {
                 if (_canvasGroup == null)
                 {
-                    _canvasGroup = ActivationTarget.GetComponent<CanvasGroup>();
+                    _canvasGroup = GetComponent<CanvasGroup>();
                     if (_canvasGroup == null)
-                        _canvasGroup = ActivationTarget.AddComponent<CanvasGroup>();
+                        _canvasGroup = gameObject.AddComponent<CanvasGroup>();
                 }
 
                 _canvasGroup.alpha = isActive ? 1f : 0f;
@@ -55,8 +47,8 @@ namespace RevealGame.UI
                 return;
             }
 
-            if (ActivationTarget.activeSelf != isActive)
-                ActivationTarget.SetActive(isActive);
+            if (gameObject.activeSelf != isActive)
+                gameObject.SetActive(isActive);
         }
     }
 }

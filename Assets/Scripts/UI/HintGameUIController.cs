@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -87,47 +86,9 @@ namespace RevealGame.UI
 
         private void EnsureSteps()
         {
-            if (_steps != null && _steps.Length > 0
-                && _steps.Any(step => step != null && step.GetComponent<HintGameView>() != null))
-            {
-                _steps = _steps.Where(step => step != null).OrderBy(step => step.Order).ToArray();
-                return;
-            }
-
-            var configuredSteps = GetComponentsInChildren<HintGameNavigationStep>(true);
-            if (configuredSteps.Any(step => step != null && step.GetComponent<HintGameView>() != null))
-            {
-                _steps = configuredSteps.OrderBy(step => step.Order).ToArray();
-                return;
-            }
-
-            var discoveredSteps = new List<HintGameNavigationStep>();
-            AddDiscoveredStep<PreGamePreviewView>(discoveredSteps, 0, true);
-            AddDiscoveredStep<HintGameView>(discoveredSteps, 1, true, useCanvasGroup: true);
-            AddDiscoveredStep<AnswerPopupView>(discoveredSteps, 2, false);
-            AddDiscoveredStep<RouletteDisplay>(discoveredSteps, 3, false);
-            AddDiscoveredStep<PostGamePreviewView>(discoveredSteps, 4, false);
-
-            _steps = discoveredSteps.OrderBy(step => step.Order).ToArray();
-        }
-
-        private void AddDiscoveredStep<T>(List<HintGameNavigationStep> steps, int order,
-            bool allowPrevious, bool useCanvasGroup = false) where T : Component
-        {
-            // Hint-game phases are standalone prefabs placed beside HintGameScreen
-            // under the canvas, so they are not necessarily descendants of this controller.
-            var component = GetComponentInChildren<T>(true)
-                ?? FindAnyObjectByType<T>(FindObjectsInactive.Include);
-            if (component == null)
-                return;
-
-            var step = component.GetComponent<HintGameNavigationStep>();
-            if (step == null)
-                step = component.gameObject.AddComponent<HintGameNavigationStep>();
-
-            step.Configure(order, allowPrevious, useCanvasGroup);
-            if (!steps.Contains(step))
-                steps.Add(step);
+            _steps = _steps == null
+                ? System.Array.Empty<HintGameNavigationStep>()
+                : _steps.Where(step => step != null).OrderBy(step => step.Order).ToArray();
         }
 
         private void NavigateTo(int targetIndex)

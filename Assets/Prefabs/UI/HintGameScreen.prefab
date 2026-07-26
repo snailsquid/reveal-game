@@ -96,7 +96,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: RevealGame::RevealGame.UI.HintGameUIController
   _steps:
   - {fileID: 5257522044520672447}
-  - {fileID: 0}
+  - {fileID: 1905037685332885078}
   - {fileID: 6594526209487641957}
   - {fileID: 2079625568566837645}
   - {fileID: 6364095581705113304}
@@ -726,6 +726,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 85cce657e2cf6c6da87bc75180ab337e, type: 3}
+--- !u!114 &1905037685332885078 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7261071268582892309, guid: 85cce657e2cf6c6da87bc75180ab337e, type: 3}
+  m_PrefabInstance: {fileID: 9130076788948606275}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e9a5a6d9de74fb9b8c4fb3ef0e635d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RevealGame::RevealGame.UI.HintGameNavigationStep
 --- !u!224 &4478974458151842336 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4655613695729217379, guid: 85cce657e2cf6c6da87bc75180ab337e, type: 3}

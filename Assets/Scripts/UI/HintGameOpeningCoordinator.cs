@@ -344,7 +344,7 @@ namespace RevealGame.UI
         }
 
         private bool IsStepFor<T>(HintGameNavigationStep step, T view) where T : Component
-            => step != null && view != null && step.ActivationTarget == view.gameObject;
+            => step != null && view != null && step.gameObject == view.gameObject;
 
         private T FindPhaseView<T>() where T : Component
             => GetComponentInChildren<T>(true)
