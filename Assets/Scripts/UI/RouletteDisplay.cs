@@ -22,6 +22,7 @@ namespace RevealGame.UI
         [SerializeField] private float _itemSpacing = 120f;
 
         private GameManager _gameManager;
+        private IReadOnlyList<Data.ItemData> _testItems;
         private List<string> _rewardTitles = new List<string>();
         private List<GameObject> _reelItems = new List<GameObject>();
         private float _currentPosition = 0f;
@@ -41,6 +42,17 @@ namespace RevealGame.UI
         public void Setup(GameManager gameManager)
         {
             _gameManager = gameManager;
+            _testItems = null;
+        }
+
+        /// <summary>
+        /// Supplies item data for an isolated roulette display test scene.
+        /// Production gameplay should use <see cref="Setup(GameManager)"/>.
+        /// </summary>
+        public void SetupTestItems(IReadOnlyList<Data.ItemData> items)
+        {
+            _gameManager = null;
+            _testItems = items;
         }
 
         public IEnumerator Play(IReadOnlyList<string> rewardItemIds)
@@ -127,7 +139,7 @@ namespace RevealGame.UI
 
             yield return new WaitForSecondsRealtime(0.3f);
 
-            var reward = _gameManager.LootboxEngine.GetItemById(rewardItemId);
+            var reward = GetItemById(rewardItemId);
             string rewardTitle = reward != null ? reward.title : rewardItemId;
             _rewardTitles.Add(rewardTitle);
 
@@ -139,7 +151,7 @@ namespace RevealGame.UI
 
         private void BuildReel(string winningItemId)
         {
-            List<Data.ItemData> allItems = _gameManager.LootboxEngine.GetAllItems();
+            List<Data.ItemData> allItems = GetAllItems();
 
             if (allItems.Count == 0)
                 return;
@@ -174,26 +186,26 @@ namespace RevealGame.UI
             GameObject cardObj = Instantiate(_itemCardPrefab, _reelContainer);
             cardObj.name = $"ReelItem_{index}";
 
-            var item = _gameManager.LootboxEngine.GetItemById(itemId);
+            var item = GetItemById(itemId);
             var rawImage = cardObj.GetComponent<RawImage>();
 
             if (rawImage != null && item != null)
             {
-                var mediaDisplay = _gameManager.MediaDisplay;
-                if (mediaDisplay != null)
+                var sprite = item.sprite;
+                var mediaDisplay = _gameManager?.MediaDisplay;
+                if (sprite == null && mediaDisplay != null)
+                    sprite = mediaDisplay.ResolveItemSprite(item);
+
+                if (sprite != null && sprite.texture != null)
                 {
-                    var sprite = mediaDisplay.ResolveItemSprite(item);
-                    if (sprite != null && sprite.texture != null)
-                    {
-                        RenderTexture renderTexture = new RenderTexture(
-                            sprite.texture.width,
-                            sprite.texture.height,
-                            0,
-                            RenderTextureFormat.ARGB32
-                        );
-                        Graphics.Blit(sprite.texture, renderTexture);
-                        rawImage.texture = renderTexture;
-                    }
+                    RenderTexture renderTexture = new RenderTexture(
+                        sprite.texture.width,
+                        sprite.texture.height,
+                        0,
+                        RenderTextureFormat.ARGB32
+                    );
+                    Graphics.Blit(sprite.texture, renderTexture);
+                    rawImage.texture = renderTexture;
                 }
             }
 
@@ -230,6 +242,33 @@ namespace RevealGame.UI
         {
             Hide();
             ContinueRequested?.Invoke();
+        }
+
+        private List<Data.ItemData> GetAllItems()
+        {
+            if (_gameManager?.LootboxEngine != null)
+                return _gameManager.LootboxEngine.GetAllItems();
+
+            return _testItems != null
+                ? new List<Data.ItemData>(_testItems)
+                : new List<Data.ItemData>();
+        }
+
+        private Data.ItemData GetItemById(string itemId)
+        {
+            if (_gameManager?.LootboxEngine != null)
+                return _gameManager.LootboxEngine.GetItemById(itemId);
+
+            if (_testItems == null)
+                return null;
+
+            foreach (var item in _testItems)
+            {
+                if (item != null && item.id == itemId)
+                    return item;
+            }
+
+            return null;
         }
     }
 }
