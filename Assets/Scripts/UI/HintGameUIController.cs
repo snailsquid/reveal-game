@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using UnityEngine;
 
 namespace RevealGame.UI
@@ -88,7 +87,7 @@ namespace RevealGame.UI
         {
             _steps = _steps == null
                 ? System.Array.Empty<HintGameNavigationStep>()
-                : _steps.Where(step => step != null).OrderBy(step => step.Order).ToArray();
+                : System.Array.FindAll(_steps, step => step != null);
         }
 
         private void NavigateTo(int targetIndex)
