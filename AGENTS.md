@@ -7,7 +7,8 @@ This is a unity project for a game with the main goal being to gacha or open cas
 Everything must follow best practices of Unity and C#.
 Make best use of prefabs whenever fitting.
 Always make sure unity compiles
-Verify Unity projects with the Unity Editor or Unity command-line validation, not dotnet.
+Verify Unity projects with the Unity MCP, not dotnet. If for whatever reason you cannot verify with Unity MCP ask the user to turn it back on instead of continuing
+Use TextTMP instead of plain Text component for texts
 
 # Glossary
 
@@ -59,6 +60,7 @@ yaml file contains the following
    h. Goes back to Lootboxes Screen, lootbox greyed out, winner(s) are shown on top of the lootbox
 
 <!-- CODEGRAPH_START -->
+
 ## CodeGraph
 
 In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the repo root), reach for it BEFORE grep/find or reading files when you need to understand or locate code:
@@ -67,4 +69,5 @@ In repositories indexed by CodeGraph (a `.codegraph/` directory exists at the re
 - **Shell** (always works): `codegraph explore "<symbol names or question>"` prints the same output.
 
 If there is no `.codegraph/` directory, skip CodeGraph entirely — indexing is the user's decision.
+
 <!-- CODEGRAPH_END -->

@@ -155,6 +155,12 @@ namespace RevealGame.UI
             if (_submitButton != null) _submitButton.interactable = interactable;
         }
 
+        public void SetPreviousInteractable(bool interactable)
+        {
+            if (_backButton != null)
+                _backButton.interactable = interactable;
+        }
+
         private void OnSubmitClicked()
         {
             if (_answerInput == null || string.IsNullOrWhiteSpace(_answerInput.text))

@@ -126,11 +126,6 @@ namespace RevealGame.UI
         {
             EnsureScreenNavigator();
             _screenNavigator.ShowHintGameScreen();
-
-            HintGameEngine.GetOrAssignHint();
-            var controller = _screenNavigator.HintGameScreen?.GetComponent<HintGameUIController>();
-            if (controller != null)
-                controller.ShowCurrentHint();
         }
 
         public IReadOnlyList<string> OpenLootboxForReveal()

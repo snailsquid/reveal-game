@@ -5,6 +5,17 @@ using UnityEngine;
 
 namespace RevealGame.UI
 {
+    public interface IItemPreviewView
+    {
+        void Setup(GameManager gameManager);
+        void Show(IReadOnlyList<Data.ItemData> items);
+        void Clear();
+        void SetVisible(bool visible);
+        void SetPreviousInteractable(bool interactable);
+        event Action NextRequested;
+        event Action PreviousRequested;
+    }
+
     public interface IHintGameView
     {
         void Setup(GameManager gameManager);

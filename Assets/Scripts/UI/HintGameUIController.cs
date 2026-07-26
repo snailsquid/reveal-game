@@ -1,212 +1,155 @@
-using UnityEngine;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace RevealGame.UI
 {
-    public class HintGameUIController : MonoBehaviour
+    /// <summary>
+    /// Owns only ordered Next/Previous navigation for the hint-game UI.
+    /// Phase-specific work is handled by HintGameOpeningCoordinator.
+    /// </summary>
+    public sealed class HintGameUIController : MonoBehaviour
     {
-        [Header("Phase Views")]
-        [SerializeField] private HintGameView _hintView;
-        [SerializeField] private AnswerPopupView _answerPopupView;
-        [SerializeField] private RouletteDisplay _rouletteDisplay;
+        [Header("Ordered UI Steps")]
+        [SerializeField] private HintGameNavigationStep[] _steps;
+        [SerializeField] private bool _allowExitFromFirstStep = true;
 
-        [Header("Dependencies")]
-        [SerializeField] private GameManager _gameManager;
+        private int _currentIndex;
 
-        private enum OpeningState
-        {
-            AwaitingStart,
-            RevealingRewards,
-            AwaitingExit
-        }
+        public event Action<HintGameNavigationStep> StepChanged;
+        public event Action ExitRequested;
+        public event Action Finished;
 
-        private OpeningState _openingState;
-        private Coroutine _matchedAnswerRoutine;
+        public HintGameNavigationStep CurrentStep
+            => _steps != null && _steps.Length > 0 && _currentIndex >= 0 && _currentIndex < _steps.Length
+                ? _steps[_currentIndex]
+                : null;
 
-        private Data.GameSettings Settings => _gameManager?.Session?.Config?.settings;
+        public bool CanPrevious
+            => CurrentStep != null
+                && (_currentIndex == 0 ? _allowExitFromFirstStep : CurrentStep.CanGoPrevious);
 
         private void Awake()
         {
-            if (_hintView != null) _hintView.Setup(_gameManager);
-            if (_answerPopupView != null) _answerPopupView.Setup(_gameManager);
-            if (_rouletteDisplay != null) _rouletteDisplay.Setup(_gameManager);
+            EnsureSteps();
+
+            if (GetComponent<HintGameOpeningCoordinator>() == null)
+                gameObject.AddComponent<HintGameOpeningCoordinator>();
         }
 
         private void OnEnable()
         {
-            SubscribeToDiscordListener();
-            _openingState = OpeningState.AwaitingStart;
-
-            if (_hintView != null)
-            {
-                _hintView.AnswerSubmitted += OnHintAnswerSubmitted;
-                _hintView.BackRequested += OnHintBackRequested;
-                _hintView.SetVisible(true);
-            }
-
-            if (_answerPopupView != null)
-            {
-                _answerPopupView.Dismissed += OnPopupDismissed;
-                _answerPopupView.Hide();
-            }
-
-            if (_rouletteDisplay != null)
-            {
-                _rouletteDisplay.ContinueRequested += OnRouletteContinue;
-                _rouletteDisplay.gameObject.SetActive(false);
-            }
-        }
-
-        private void OnDisable()
-        {
-            UnsubscribeFromDiscordListener();
-            _gameManager?.DiscordAnswerListener?.StopListening();
-
-            if (_hintView != null)
-            {
-                _hintView.AnswerSubmitted -= OnHintAnswerSubmitted;
-                _hintView.BackRequested -= OnHintBackRequested;
-            }
-
-            if (_answerPopupView != null)
-                _answerPopupView.Dismissed -= OnPopupDismissed;
-
-            if (_rouletteDisplay != null)
-                _rouletteDisplay.ContinueRequested -= OnRouletteContinue;
-        }
-
-        public void ShowCurrentHint()
-        {
-            var hint = _gameManager.HintGameEngine.GetCurrentHint();
-            _hintView?.ShowHint(hint);
-        }
-
-        private void OnHintAnswerSubmitted(string answer)
-        {
-            if (_openingState != OpeningState.AwaitingStart)
+            if (_steps == null || _steps.Length == 0)
                 return;
 
-            ProcessAnswer(answer, "Player");
+            _currentIndex = 0;
+            SetAllStepsInactive();
+            SetCurrentStepActive();
         }
 
-        private void OnDiscordAnswerMatched(DiscordAnswerMatch match)
+        /// <summary>
+        /// Moves to the next configured step, or finishes the flow at the end.
+        /// </summary>
+        public void Next()
         {
-            if (_openingState != OpeningState.AwaitingStart)
+            if (CurrentStep == null)
                 return;
 
-            ProcessAnswer(match.Guess, match.Username);
-        }
-
-        private void ProcessAnswer(string answer, string username)
-        {
-            var result = _gameManager.HintGameEngine.SubmitAnswer(answer);
-            if (!result.IsCorrect)
+            if (_currentIndex >= _steps.Length - 1)
             {
-                Debug.LogWarning($"[{GetType().Name}] Answer does not match hint.");
+                CurrentStep.SetActive(false);
+                Finished?.Invoke();
                 return;
             }
 
-            if (_hintView != null) _hintView.SetVisible(false);
-            _gameManager.DiscordAnswerListener?.StopListening();
-
-            if (_answerPopupView != null)
-            {
-                // ResultPopup starts inactive, so enable the view component before
-                // invoking its presentation lifecycle and dismissal event.
-                if (!_answerPopupView.gameObject.activeSelf)
-                    _answerPopupView.gameObject.SetActive(true);
-
-                string message = _gameManager.Session.Config.settings.FormatCorrectAnswer(username, answer);
-                _answerPopupView.Show(message, 3f);
-            }
-            else
-            {
-                _matchedAnswerRoutine = StartCoroutine(ShowMatchThenOpenLootbox());
-            }
+            NavigateTo(_currentIndex + 1);
         }
 
-        private void OnPopupDismissed()
+        /// <summary>
+        /// Moves to the previous configured step. At the first step it exits the
+        /// hint-game screen when exit navigation is enabled.
+        /// </summary>
+        public void Previous()
         {
-            if (_openingState == OpeningState.AwaitingStart)
-                StartCoroutine(OpenLootboxRoutine());
-        }
-
-        private void OnRouletteContinue()
-        {
-            if (_openingState == OpeningState.AwaitingExit)
-                _gameManager.CompleteLootboxOpening();
-        }
-
-        private void OnHintBackRequested()
-        {
-            if (_openingState == OpeningState.RevealingRewards)
+            if (CurrentStep == null || !CanPrevious)
                 return;
 
-            if (_openingState == OpeningState.AwaitingExit)
-                _gameManager.CompleteLootboxOpening();
-            else
-                _gameManager.CancelLootboxOpening();
-        }
-
-        private IEnumerator ShowMatchThenOpenLootbox()
-        {
-            yield return new WaitForSecondsRealtime(3f);
-            _matchedAnswerRoutine = null;
-
-            if (_openingState == OpeningState.AwaitingStart)
-                StartCoroutine(OpenLootboxRoutine());
-        }
-
-        private IEnumerator OpenLootboxRoutine()
-        {
-            _openingState = OpeningState.RevealingRewards;
-
-            IReadOnlyList<string> rewardItemIds;
-            try
+            if (_currentIndex == 0)
             {
-                rewardItemIds = _gameManager.OpenLootboxForReveal();
-            }
-            catch (Exception exception)
-            {
-                Debug.LogException(exception);
-                _rouletteDisplay?.ShowFailure(Settings?.FormatLootboxOpenFailed()
-                    ?? Data.GameSettings.DefaultLootboxOpenFailedFormat);
-                _openingState = OpeningState.AwaitingExit;
-                yield break;
+                CurrentStep.SetActive(false);
+                ExitRequested?.Invoke();
+                return;
             }
 
-            if (_answerPopupView != null)
-                _answerPopupView.Hide();
-
-            if (_rouletteDisplay != null)
-            {
-                yield return StartCoroutine(_rouletteDisplay.Play(rewardItemIds));
-
-                var titles = _rouletteDisplay.CollectedRewardTitles;
-                _rouletteDisplay.ShowSummary(titles);
-            }
-
-            _openingState = OpeningState.AwaitingExit;
+            NavigateTo(_currentIndex - 1);
         }
 
-        private void SubscribeToDiscordListener()
+        private void EnsureSteps()
         {
-            var listener = _gameManager?.DiscordAnswerListener;
-            if (listener == null)
+            if (_steps != null && _steps.Length > 0
+                && _steps.Any(step => step != null && step.GetComponent<HintGameView>() != null))
+            {
+                _steps = _steps.Where(step => step != null).OrderBy(step => step.Order).ToArray();
+                return;
+            }
+
+            var configuredSteps = GetComponentsInChildren<HintGameNavigationStep>(true);
+            if (configuredSteps.Any(step => step != null && step.GetComponent<HintGameView>() != null))
+            {
+                _steps = configuredSteps.OrderBy(step => step.Order).ToArray();
+                return;
+            }
+
+            var discoveredSteps = new List<HintGameNavigationStep>();
+            AddDiscoveredStep<PreGamePreviewView>(discoveredSteps, 0, true);
+            AddDiscoveredStep<HintGameView>(discoveredSteps, 1, true, useCanvasGroup: true);
+            AddDiscoveredStep<AnswerPopupView>(discoveredSteps, 2, false);
+            AddDiscoveredStep<RouletteDisplay>(discoveredSteps, 3, false);
+            AddDiscoveredStep<PostGamePreviewView>(discoveredSteps, 4, false);
+
+            _steps = discoveredSteps.OrderBy(step => step.Order).ToArray();
+        }
+
+        private void AddDiscoveredStep<T>(List<HintGameNavigationStep> steps, int order,
+            bool allowPrevious, bool useCanvasGroup = false) where T : Component
+        {
+            // Hint-game phases are standalone prefabs placed beside HintGameScreen
+            // under the canvas, so they are not necessarily descendants of this controller.
+            var component = GetComponentInChildren<T>(true)
+                ?? FindAnyObjectByType<T>(FindObjectsInactive.Include);
+            if (component == null)
                 return;
 
-            listener.AnswerMatched += OnDiscordAnswerMatched;
+            var step = component.GetComponent<HintGameNavigationStep>();
+            if (step == null)
+                step = component.gameObject.AddComponent<HintGameNavigationStep>();
+
+            step.Configure(order, allowPrevious, useCanvasGroup);
+            if (!steps.Contains(step))
+                steps.Add(step);
         }
 
-        private void UnsubscribeFromDiscordListener()
+        private void NavigateTo(int targetIndex)
         {
-            var listener = _gameManager?.DiscordAnswerListener;
-            if (listener == null)
+            if (targetIndex < 0 || targetIndex >= _steps.Length || targetIndex == _currentIndex)
                 return;
 
-            listener.AnswerMatched -= OnDiscordAnswerMatched;
+            CurrentStep?.SetActive(false);
+            _currentIndex = targetIndex;
+            SetCurrentStepActive();
+        }
+
+        private void SetCurrentStepActive()
+        {
+            CurrentStep?.SetActive(true);
+            StepChanged?.Invoke(CurrentStep);
+        }
+
+        private void SetAllStepsInactive()
+        {
+            foreach (var step in _steps)
+                step?.SetActive(false);
         }
     }
 }

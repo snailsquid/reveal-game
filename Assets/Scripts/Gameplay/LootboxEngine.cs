@@ -91,6 +91,21 @@ namespace RevealGame.Gameplay
         }
 
         /// <summary>
+        /// Gets all items assigned to the currently selected lootbox, before it opens.
+        /// </summary>
+        public List<Data.ItemData> GetCurrentContents()
+        {
+            var lootbox = _session.CurrentLootbox;
+            if (lootbox == null || lootbox.assignedItemIds == null)
+                return new List<Data.ItemData>();
+
+            return lootbox.assignedItemIds
+                .Select(GetItemById)
+                .Where(item => item != null)
+                .ToList();
+        }
+
+        /// <summary>
         /// Checks if a specific lootbox has been opened.
         /// </summary>
         public bool IsLootboxOpened(int index)
