@@ -212,6 +212,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1000000012, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000012, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000012, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1000000012, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -242,10 +258,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e9a5a6d9de74fb9b8c4fb3ef0e635d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RevealGame::RevealGame.UI.HintGameNavigationStep
-  _order: 3
   _allowPrevious: 0
   _useCanvasGroup: 0
-  _activationTarget: {fileID: 0}
 --- !u!114 &9227219214 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1000000004, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}

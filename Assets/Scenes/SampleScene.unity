@@ -849,6 +849,14 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4002477774367406215, guid: 85cce657e2cf6c6da87bc75180ab337e, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4002477774367406215, guid: 85cce657e2cf6c6da87bc75180ab337e, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4655613695729217379, guid: 85cce657e2cf6c6da87bc75180ab337e, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -1215,6 +1223,14 @@ PrefabInstance:
       propertyPath: _gameManager
       value: 
       objectReference: {fileID: 2104875376}
+    - target: {fileID: 5277977021241271748, guid: 3d280c11cd73c5953947a17a15100c63, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5277977021241271748, guid: 3d280c11cd73c5953947a17a15100c63, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5644455502037323486, guid: 3d280c11cd73c5953947a17a15100c63, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
