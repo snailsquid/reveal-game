@@ -343,7 +343,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1, g: 0.1, b: 0.1, a: 0.95}
+  m_Color: {r: 0.1, g: 0.1, b: 0.1, a: 0.57254905}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -389,7 +389,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e9a5a6d9de74fb9b8c4fb3ef0e635d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RevealGame::RevealGame.UI.HintGameNavigationStep
-  _order: 2
   _allowPrevious: 0
   _useCanvasGroup: 0
-  _activationTarget: {fileID: 0}
