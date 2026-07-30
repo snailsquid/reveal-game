@@ -190,9 +190,7 @@ namespace RevealGame.Tests
             var items = serialized.FindProperty("_items");
             items.arraySize = 2;
             items.GetArrayElementAtIndex(0).FindPropertyRelative("title").stringValue = "First Item";
-            items.GetArrayElementAtIndex(0).FindPropertyRelative("description").stringValue = "First description";
             items.GetArrayElementAtIndex(1).FindPropertyRelative("title").stringValue = "Second Item";
-            items.GetArrayElementAtIndex(1).FindPropertyRelative("description").stringValue = "Second description";
 
             var hints = serialized.FindProperty("_hints");
             hints.arraySize = 1;

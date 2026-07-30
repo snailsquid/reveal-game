@@ -47,7 +47,6 @@ namespace RevealGame.Importing
             {
                 id = $"item_{index}",
                 title = entry.title,
-                description = entry.description,
                 isWinner = entry.isWinner,
                 sprite = entry.image,
                 videoClip = entry.video

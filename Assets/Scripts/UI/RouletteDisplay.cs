@@ -151,7 +151,7 @@ namespace RevealGame.UI
 
         private void BuildReel(string winningItemId)
         {
-            List<Data.ItemData> allItems = GetAllItems();
+            List<Data.ItemData> allItems = GetReelItems();
 
             if (allItems.Count == 0)
                 return;
@@ -244,10 +244,10 @@ namespace RevealGame.UI
             ContinueRequested?.Invoke();
         }
 
-        private List<Data.ItemData> GetAllItems()
+        private List<Data.ItemData> GetReelItems()
         {
             if (_gameManager?.LootboxEngine != null)
-                return _gameManager.LootboxEngine.GetAllItems();
+                return _gameManager.LootboxEngine.GetCurrentContents();
 
             return _testItems != null
                 ? new List<Data.ItemData>(_testItems)

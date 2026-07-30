@@ -44,32 +44,26 @@ MonoBehaviour:
   _discordUnavailableFormat: Discord server unavailable.
   _items:
   - title: Sunlit Paper Plane
-    description: A bright test reward used to fill the roulette reel.
     image: {fileID: 1411070990185071134, guid: 3b5930cc7f8a015a4982a3d045bc67cc, type: 3}
     video: {fileID: 0}
     isWinner: 0
   - title: Midnight Paper Plane
-    description: A dark test reward used to fill the roulette reel.
     image: {fileID: 1411070990185071134, guid: 3b5930cc7f8a015a4982a3d045bc67cc, type: 3}
     video: {fileID: 0}
     isWinner: 0
   - title: Slammer Token
-    description: A test reward with a second artwork source.
     image: {fileID: 3542890154450382275, guid: 894bd1d56e63bcd9b90039a3eec23627, type: 3}
     video: {fileID: 0}
     isWinner: 0
   - title: Bonus Ticket
-    description: A common test reward used between the winners.
     image: {fileID: 3542890154450382275, guid: 894bd1d56e63bcd9b90039a3eec23627, type: 3}
     video: {fileID: 0}
     isWinner: 0
   - title: Golden Test Crown
-    description: The first declared winner in the roulette test.
     image: {fileID: 1411070990185071134, guid: 3b5930cc7f8a015a4982a3d045bc67cc, type: 3}
     video: {fileID: 0}
     isWinner: 1
   - title: Legendary Test Blade
-    description: The second declared winner in the roulette test.
     image: {fileID: 3542890154450382275, guid: 894bd1d56e63bcd9b90039a3eec23627, type: 3}
     video: {fileID: 0}
     isWinner: 1

@@ -136,10 +136,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bf505a0f8c1623419b8dda372c2c6cfe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RevealGame::RevealGame.UI.LootboxButtonController
-  _button: {fileID: 0}
-  _indexLabel: {fileID: 0}
-  _winnerLabel: {fileID: 0}
-  _openedOverlay: {fileID: 0}
+  _button: {fileID: 6032798730184231480}
+  _indexLabel: {fileID: 4764564497630527878}
+  _winnerLabel: {fileID: 6369106731879106793}
+  _openedOverlay: {fileID: 9061348229394550273}
 --- !u!1 &6390022257865487492
 GameObject:
   m_ObjectHideFlags: 0

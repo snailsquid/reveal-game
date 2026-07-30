@@ -44,17 +44,10 @@ MonoBehaviour:
   _discordUnavailableFormat: Discord server unavailable.
   _items:
   - title: Paper Plane Shooter
-    description: 'Paper Plane Shooter is inspired by childhood memories from my school
-      days. During recess, my friends and I often made paper airplanes and spent
-      time flying them together. Those simple moments of creativity, imagination,
-      and fun left a lasting impression on me. '
     image: {fileID: 1411070990185071134, guid: 3b5930cc7f8a015a4982a3d045bc67cc, type: 3}
     video: {fileID: 0}
     isWinner: 0
   - title: Slam it, Slam!
-    description: 'A game about you become Slamet, a junior developer in small studio.
-      Slamet and team are have a meeting with publishers to present a game development
-      progress, and the presentation are probably 10 minutes left until the end. '
     image: {fileID: 3542890154450382275, guid: 894bd1d56e63bcd9b90039a3eec23627, type: 3}
     video: {fileID: 0}
     isWinner: 1

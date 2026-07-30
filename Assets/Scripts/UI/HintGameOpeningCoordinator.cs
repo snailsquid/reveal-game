@@ -90,6 +90,13 @@ namespace RevealGame.UI
                 _postGamePreviewView.NextRequested += _navigation.Next;
 
             SubscribeToDiscordListener();
+
+            // HintGameUIController resets and announces its first step in OnEnable.
+            // Unity does not guarantee that this component subscribes before that
+            // announcement, so refresh the active step after subscribing. This keeps
+            // the preview in sync with the lootbox selected on every screen entry.
+            if (_navigation.CurrentStep != null)
+                OnStepChanged(_navigation.CurrentStep);
         }
 
         private void Start()
