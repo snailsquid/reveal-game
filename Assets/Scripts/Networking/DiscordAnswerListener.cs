@@ -79,6 +79,28 @@ namespace RevealGame.UI
             }
         }
 
+#if UNITY_EDITOR
+        /// <summary>
+        /// Raises a successful Discord answer using the answer for the hint currently being listened for.
+        /// This is intended for the Unity editor's Discord answer simulator.
+        /// </summary>
+        /// <param name="username">The simulated Discord username.</param>
+        /// <returns>True when a pending hint was available to simulate.</returns>
+        public bool SimulateCorrectAnswer(string username)
+        {
+            if (_pendingHint == null)
+                return false;
+
+            string answer = _pendingHint.answer;
+            StopListening();
+            UpdateStatus("Discord answer received.");
+            AnswerMatched?.Invoke(new DiscordAnswerMatch(username?.Trim(), answer));
+            return true;
+        }
+
+        public bool HasPendingHintForEditor => _pendingHint != null;
+#endif
+
         private IEnumerator MonitorHealth()
         {
             while (true)
