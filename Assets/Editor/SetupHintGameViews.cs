@@ -8,8 +8,6 @@ namespace RevealGame.Editor
 {
     public static class SetupHintGameViews
     {
-        private const string PreviewFontPath = "Assets/TextMesh Pro/Fonts/LiberationSans.ttf";
-
         [MenuItem("Tools/Setup Hint Game Views")]
         public static void Setup()
         {
@@ -50,38 +48,8 @@ namespace RevealGame.Editor
                 ? resultPopup.GetComponent<AnswerPopupView>()
                 : null;
             var existingRouletteDisplay = hintGameScreen.GetComponentInChildren<RouletteDisplay>(true);
-            var existingPreGamePreview = hintGameScreen.GetComponentInChildren<PreGamePreviewView>(true);
-            var existingPostGamePreview = hintGameScreen.GetComponentInChildren<PostGamePreviewView>(true);
             if (existingHintView != null && existingAnswerPopup != null && existingRouletteDisplay != null)
             {
-                if (existingPreGamePreview == null)
-                {
-                    var legacyPreGamePreviewGO = new GameObject("PreGamePreviewView")
-                    {
-                        layer = hintGameScreen.layer
-                    };
-                    legacyPreGamePreviewGO.transform.SetParent(hintGameScreen.transform, false);
-                    StretchToScreen(legacyPreGamePreviewGO.transform);
-                    legacyPreGamePreviewGO.SetActive(false);
-                    existingPreGamePreview = legacyPreGamePreviewGO.AddComponent<PreGamePreviewView>();
-                    existingPreGamePreview.SetFieldValue("_font", AssetDatabase.LoadAssetAtPath<Font>(PreviewFontPath));
-                }
-
-                if (existingPostGamePreview == null)
-                {
-                    var legacyPostGamePreviewGO = new GameObject("PostGamePreviewView")
-                    {
-                        layer = hintGameScreen.layer
-                    };
-                    legacyPostGamePreviewGO.transform.SetParent(hintGameScreen.transform, false);
-                    StretchToScreen(legacyPostGamePreviewGO.transform);
-                    legacyPostGamePreviewGO.SetActive(false);
-                    existingPostGamePreview = legacyPostGamePreviewGO.AddComponent<PostGamePreviewView>();
-                    existingPostGamePreview.SetFieldValue("_font", AssetDatabase.LoadAssetAtPath<Font>(PreviewFontPath));
-                }
-
-                existingPreGamePreview.SetFieldValue("_font", AssetDatabase.LoadAssetAtPath<Font>(PreviewFontPath));
-                existingPostGamePreview.SetFieldValue("_font", AssetDatabase.LoadAssetAtPath<Font>(PreviewFontPath));
                 EditorSceneManager.MarkSceneDirty(hintGameScreen.scene);
                 Debug.Log("Hint Game Views are already configured.");
                 return;
@@ -179,28 +147,8 @@ namespace RevealGame.Editor
             var rouletteDisplay = rouletteDisplayGO.AddComponent<RouletteDisplay>();
             rouletteDisplay.SetFieldValue("_rouletteRoot", rouletteDisplayGO);
 
-            var preGamePreviewGO = new GameObject("PreGamePreviewView")
-            {
-                layer = hintGameScreen.layer
-            };
-            preGamePreviewGO.transform.SetParent(hintGameScreen.transform, false);
-            StretchToScreen(preGamePreviewGO.transform);
-            preGamePreviewGO.SetActive(false);
-            var preGamePreview = preGamePreviewGO.AddComponent<PreGamePreviewView>();
-            preGamePreview.SetFieldValue("_font", AssetDatabase.LoadAssetAtPath<Font>(PreviewFontPath));
-
-            var postGamePreviewGO = new GameObject("PostGamePreviewView")
-            {
-                layer = hintGameScreen.layer
-            };
-            postGamePreviewGO.transform.SetParent(hintGameScreen.transform, false);
-            StretchToScreen(postGamePreviewGO.transform);
-            postGamePreviewGO.SetActive(false);
-            var postGamePreview = postGamePreviewGO.AddComponent<PostGamePreviewView>();
-            postGamePreview.SetFieldValue("_font", AssetDatabase.LoadAssetAtPath<Font>(PreviewFontPath));
-            
-            // HintGameUIController discovers the ordered steps at runtime and
-            // HintGameOpeningCoordinator discovers these phase views.
+            // HintGameUIController owns ordered navigation. Each step requests
+            // Next or Previous through its own HintGameNavigationStep.
             
             // Mark scene as dirty
             EditorSceneManager.MarkSceneDirty(hintGameScreen.scene);
@@ -228,18 +176,6 @@ namespace RevealGame.Editor
             {
                 Debug.LogWarning($"Field {fieldName} not found on {componentType.Name}");
             }
-        }
-
-        private static void StretchToScreen(Transform transform)
-        {
-            var rectTransform = transform as RectTransform;
-            if (rectTransform == null)
-                return;
-
-            rectTransform.anchorMin = Vector2.zero;
-            rectTransform.anchorMax = Vector2.one;
-            rectTransform.offsetMin = Vector2.zero;
-            rectTransform.offsetMax = Vector2.zero;
         }
     }
 }

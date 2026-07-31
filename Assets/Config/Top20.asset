@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac76cc5b5de38c2febe3a99306e961a2, type: 3}
   m_Name: Top20
   m_EditorClassIdentifier: RevealGame::RevealGame.Data.GameConfigSO
-  _nLootbox: 1
+  _nLootbox: 2
   _correctAnswerFormat: '{user} guessed the correct answer:
 
     ''{answer}'''
@@ -49,6 +49,14 @@ MonoBehaviour:
     isWinner: 0
   - title: Slam it, Slam!
     image: {fileID: 3542890154450382275, guid: 894bd1d56e63bcd9b90039a3eec23627, type: 3}
+    video: {fileID: 0}
+    isWinner: 1
+  - title: Project Survive
+    image: {fileID: 7981011891306965376, guid: 3dd44e2e91f325200afaf72fd800ac4f, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: Wizard Doodle
+    image: {fileID: 3152093937716925917, guid: 21140843c6a19b7a497a0b8a7e41adc0, type: 3}
     video: {fileID: 0}
     isWinner: 1
   _hints:

@@ -18,6 +18,7 @@ namespace RevealGame.UI
 
         private GameManager _gameManager;
         private Coroutine _autoDismissCoroutine;
+        private HintGameNavigationStep _navigationStep;
 
         private Data.GameSettings Settings
             => _gameManager?.Session?.Config?.settings;
@@ -29,6 +30,7 @@ namespace RevealGame.UI
         private void Awake()
         {
             AutoDiscoverUIReferences();
+            _navigationStep = GetComponent<HintGameNavigationStep>();
 
             if (_popupRoot != null)
                 _popupRoot.SetActive(false);
@@ -106,6 +108,7 @@ namespace RevealGame.UI
         private void OnContinueClicked()
         {
             Hide();
+            _navigationStep?.RequestNext();
             Dismissed?.Invoke();
         }
 
@@ -114,6 +117,7 @@ namespace RevealGame.UI
             yield return new WaitForSecondsRealtime(delay);
             _autoDismissCoroutine = null;
             Hide();
+            _navigationStep?.RequestNext();
             Dismissed?.Invoke();
         }
     }

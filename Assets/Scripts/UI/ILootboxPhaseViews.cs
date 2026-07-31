@@ -10,10 +10,7 @@ namespace RevealGame.UI
         void Setup(GameManager gameManager);
         void Show(IReadOnlyList<Data.ItemData> items);
         void Clear();
-        void SetVisible(bool visible);
         void SetPreviousInteractable(bool interactable);
-        event Action NextRequested;
-        event Action PreviousRequested;
     }
 
     public interface IHintGameView
@@ -24,7 +21,6 @@ namespace RevealGame.UI
         void SetVisible(bool visible);
         void SetInteractable(bool interactable);
         event Action<string> AnswerSubmitted;
-        event Action BackRequested;
     }
 
     public interface IAnswerPopupView
@@ -40,10 +36,7 @@ namespace RevealGame.UI
     {
         void Setup(GameManager gameManager);
         IEnumerator Play(IReadOnlyList<string> rewardItemIds);
-        IReadOnlyList<string> CollectedRewardTitles { get; }
-        void ShowSummary(IReadOnlyList<string> rewardTitles);
         void ShowFailure(string message);
         void Dispose();
-        event Action ContinueRequested;
     }
 }

@@ -82,32 +82,26 @@ namespace RevealGame.UI
                     : Data.GameSettings.DefaultLootboxLabelFormat;
                 ctrl.Setup(i, isOpened, OnLootboxClicked, labelText);
                 if (isOpened)
-                {
-                    var winners = _gameManager.LootboxEngine.GetAllLootboxStates()[i].winnerItemIds;
-                    ctrl.ShowWinners(BuildWinnerText(winners));
-                }
+                    ctrl.ShowWinners(GetWinnerItems(i));
                 _buttonControllers.Add(ctrl);
             }
         }
 
-        private string BuildWinnerText(List<string> winnerItemIds)
+        private List<Data.ItemData> GetWinnerItems(int lootboxIndex)
         {
-            if (winnerItemIds == null || winnerItemIds.Count == 0)
-            {
-                var settings = _gameManager.Session?.Config?.settings;
-                return settings != null
-                    ? settings.FormatOpenedNoPrize()
-                    : Data.GameSettings.DefaultOpenedNoPrizeFormat;
-            }
+            var winnerItemIds = _gameManager.LootboxEngine.GetAllLootboxStates()[lootboxIndex].winnerItemIds;
+            var winners = new List<Data.ItemData>();
+            if (winnerItemIds == null)
+                return winners;
 
-            var titles = new List<string>();
             foreach (var itemId in winnerItemIds)
             {
                 var item = _gameManager.LootboxEngine.GetItemById(itemId);
-                titles.Add(item == null ? itemId : item.title);
+                if (item != null)
+                    winners.Add(item);
             }
 
-            return string.Join("\n", titles);
+            return winners;
         }
 
         private void OnLootboxClicked(int index)

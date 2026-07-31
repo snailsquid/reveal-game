@@ -29,24 +29,12 @@ namespace RevealGame.UI
 
             _config = ScriptableObjectConfigAdapter.ToGameConfig(_configSO);
             _rouletteDisplay.SetupTestItems(_config.items);
-            _rouletteDisplay.ContinueRequested += OnRouletteContinue;
         }
 
         private void Start()
         {
             if (_playOnStart)
                 QueuePlay();
-        }
-
-        private void OnDestroy()
-        {
-            if (_rouletteDisplay != null)
-                _rouletteDisplay.ContinueRequested -= OnRouletteContinue;
-        }
-
-        private void OnRouletteContinue()
-        {
-            QueuePlay();
         }
 
         private void QueuePlay()
@@ -66,7 +54,6 @@ namespace RevealGame.UI
                 rewardIds.Add(_config.items[0].id);
 
             yield return StartCoroutine(_rouletteDisplay.Play(rewardIds));
-            _rouletteDisplay.ShowSummary(_rouletteDisplay.CollectedRewardTitles);
             _playRoutine = null;
         }
     }

@@ -21,16 +21,17 @@ namespace RevealGame.UI
         private int _currentHintImageIndex;
         private int _currentHintImageCount;
         private Data.HintData _activeHint;
+        private HintGameNavigationStep _navigationStep;
 
         private Data.GameSettings Settings
             => _gameManager?.Session?.Config?.settings;
 
         public event Action<string> AnswerSubmitted;
-        public event Action BackRequested;
 
         private void Awake()
         {
             AutoDiscoverUIReferences();
+            _navigationStep = GetComponent<HintGameNavigationStep>();
 
             if (_submitButton != null)
                 SetButtonLabelColor(_submitButton, new Color(0.08f, 0.16f, 0.12f));
@@ -41,7 +42,7 @@ namespace RevealGame.UI
                 _nextHintImageButton.onClick.AddListener(ShowNextHintImage);
 
             if (_backButton != null)
-                _backButton.onClick.AddListener(() => BackRequested?.Invoke());
+                _backButton.onClick.AddListener(OnBackClicked);
         }
 
         private void AutoDiscoverUIReferences()
@@ -170,6 +171,8 @@ namespace RevealGame.UI
             _answerInput.text = string.Empty;
             AnswerSubmitted?.Invoke(answer);
         }
+
+        private void OnBackClicked() => _navigationStep?.RequestPrevious();
 
         private void ShowPreviousHintImage()
         {

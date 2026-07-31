@@ -14,8 +14,34 @@ namespace RevealGame.UI
         [SerializeField] private bool _allowPrevious;
         [SerializeField] private bool _useCanvasGroup;
         private CanvasGroup _canvasGroup;
+        private HintGameUIController _navigation;
 
         public bool CanGoPrevious => _allowPrevious;
+
+        /// <summary>
+        /// Requests the next configured step. A step owns the interaction that
+        /// triggers this request, while the controller owns the ordered flow.
+        /// </summary>
+        public void RequestNext() => ResolveNavigation()?.Next();
+
+        /// <summary>
+        /// Requests the previous configured step.
+        /// </summary>
+        public void RequestPrevious() => ResolveNavigation()?.Previous();
+
+        internal void BindNavigation(HintGameUIController navigation)
+        {
+            _navigation = navigation;
+        }
+
+        private HintGameUIController ResolveNavigation()
+        {
+            if (_navigation == null)
+                _navigation = GetComponentInParent<HintGameUIController>(true);
+
+            return _navigation;
+        }
+
         internal void Configure(bool allowPrevious, bool useCanvasGroup)
         {
             _allowPrevious = allowPrevious;

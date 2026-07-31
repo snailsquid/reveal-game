@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using RevealGame.Data;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,18 +8,21 @@ namespace RevealGame.UI
 {
     /// <summary>
     /// Controls a single lootbox button in the selection grid.
-    /// Supports opened (greyed/disabled) and unopened states.
+    /// Supports unopened and opened states, including the opened lootbox tooltip.
     /// </summary>
     public class LootboxButtonController : MonoBehaviour
     {
         [Header("UI References")]
         [SerializeField] private Button _button;
         [SerializeField] private Text _indexLabel;
-        [SerializeField] private Text _winnerLabel;
         [SerializeField] private GameObject _openedOverlay;
+        [SerializeField] private GameObject _tooltip;
+        [SerializeField] private Transform _winnerContainer;
+        [SerializeField] private GameObject _winnerPrefab;
 
         private int _index;
         private Action<int> _onClick;
+        private readonly List<GameObject> _winnerInstances = new List<GameObject>();
 
         private void Awake()
         {
@@ -42,8 +47,9 @@ namespace RevealGame.UI
             if (_openedOverlay != null)
                 _openedOverlay.SetActive(isOpened);
 
-            if (_winnerLabel != null)
-                _winnerLabel.gameObject.SetActive(false);
+            ClearWinnerInstances();
+            if (_tooltip != null)
+                _tooltip.SetActive(false);
 
             // Remove old listeners and add new one
             if (_button != null)
@@ -54,15 +60,41 @@ namespace RevealGame.UI
         }
 
         /// <summary>
-        /// Shows winner text above the lootbox after it's opened.
+        /// Shows the opened lootbox tooltip and creates one winner card per reward.
         /// </summary>
-        public void ShowWinners(string winnerText)
+        public void ShowWinners(IReadOnlyList<ItemData> winners)
         {
-            if (_winnerLabel != null)
+            if (_tooltip == null)
+                return;
+
+            ClearWinnerInstances();
+            _tooltip.SetActive(true);
+
+            if (_winnerContainer == null || _winnerPrefab == null || winners == null)
+                return;
+
+            foreach (var winner in winners)
             {
-                _winnerLabel.text = winnerText;
-                _winnerLabel.gameObject.SetActive(true);
+                var winnerInstance = Instantiate(_winnerPrefab, _winnerContainer);
+                winnerInstance.name = $"Winner_{winner?.title ?? winner?.id ?? "Unknown"}";
+
+                var image = winnerInstance.GetComponent<Image>();
+                if (image != null && winner?.sprite != null)
+                    image.sprite = winner.sprite;
+
+                _winnerInstances.Add(winnerInstance);
             }
+        }
+
+        private void ClearWinnerInstances()
+        {
+            foreach (var winnerInstance in _winnerInstances)
+            {
+                if (winnerInstance != null)
+                    Destroy(winnerInstance);
+            }
+
+            _winnerInstances.Clear();
         }
 
         private void OnButtonClicked()

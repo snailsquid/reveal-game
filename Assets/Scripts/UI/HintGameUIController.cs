@@ -31,6 +31,7 @@ namespace RevealGame.UI
         private void Awake()
         {
             EnsureSteps();
+            BindSteps();
 
             if (GetComponent<HintGameOpeningCoordinator>() == null)
                 gameObject.AddComponent<HintGameOpeningCoordinator>();
@@ -41,6 +42,7 @@ namespace RevealGame.UI
             if (_steps == null || _steps.Length == 0)
                 return;
 
+            BindSteps();
             _currentIndex = 0;
             SetAllStepsInactive();
             SetCurrentStepActive();
@@ -88,6 +90,12 @@ namespace RevealGame.UI
             _steps = _steps == null
                 ? System.Array.Empty<HintGameNavigationStep>()
                 : System.Array.FindAll(_steps, step => step != null);
+        }
+
+        private void BindSteps()
+        {
+            foreach (var step in _steps)
+                step.BindNavigation(this);
         }
 
         private void NavigateTo(int targetIndex)

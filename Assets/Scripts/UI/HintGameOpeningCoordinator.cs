@@ -15,17 +15,15 @@ namespace RevealGame.UI
         [Header("Dependencies")]
         [SerializeField] private GameManager _gameManager;
         [SerializeField] private HintGameUIController _navigation;
-        [SerializeField] private PreGamePreviewView _preGamePreviewView;
         [SerializeField] private HintGameView _hintView;
-        [SerializeField] private AnswerPopupView _answerPopupView;
-        [SerializeField] private RouletteDisplay _rouletteDisplay;
-        [SerializeField] private PostGamePreviewView _postGamePreviewView;
 
         private string _pendingAnswerMessage;
         private Coroutine _revealRoutine;
+        private Coroutine _initialStepSyncRoutine;
         private bool _hintIsActive;
         private bool _isHandlingStep;
         private bool _discordSubscribed;
+        private HintGameNavigationStep _lastHandledStep;
 
         private Data.GameSettings Settings => _gameManager?.Session?.Config?.settings;
 
@@ -40,17 +38,8 @@ namespace RevealGame.UI
             if (_gameManager == null)
                 _gameManager = FindAnyObjectByType<GameManager>();
 
-            _preGamePreviewView ??= FindPhaseView<PreGamePreviewView>();
-            _hintView ??= FindPhaseView<HintGameView>();
-            _answerPopupView ??= FindPhaseView<AnswerPopupView>();
-            _rouletteDisplay ??= FindPhaseView<RouletteDisplay>();
-            _postGamePreviewView ??= FindPhaseView<PostGamePreviewView>();
-
-            _preGamePreviewView?.Setup(_gameManager);
+            _hintView ??= FindStepView<HintGameView>();
             _hintView?.Setup(_gameManager);
-            _answerPopupView?.Setup(_gameManager);
-            _rouletteDisplay?.Setup(_gameManager);
-            _postGamePreviewView?.Setup(_gameManager);
         }
 
         private void OnEnable()
@@ -68,49 +57,23 @@ namespace RevealGame.UI
                 _navigation.Finished += OnFinished;
             }
 
-            if (_preGamePreviewView != null)
-            {
-                _preGamePreviewView.NextRequested += _navigation.Next;
-                _preGamePreviewView.PreviousRequested += _navigation.Previous;
-            }
-
             if (_hintView != null)
-            {
                 _hintView.AnswerSubmitted += OnHintAnswerSubmitted;
-                _hintView.BackRequested += _navigation.Previous;
-            }
-
-            if (_answerPopupView != null)
-                _answerPopupView.Dismissed += _navigation.Next;
-
-            if (_rouletteDisplay != null)
-                _rouletteDisplay.ContinueRequested += _navigation.Next;
-
-            if (_postGamePreviewView != null)
-                _postGamePreviewView.NextRequested += _navigation.Next;
 
             SubscribeToDiscordListener();
-
-            // HintGameUIController resets and announces its first step in OnEnable.
-            // Unity does not guarantee that this component subscribes before that
-            // announcement, so refresh the active step after subscribing. This keeps
-            // the preview in sync with the lootbox selected on every screen entry.
-            if (_navigation.CurrentStep != null)
-                OnStepChanged(_navigation.CurrentStep);
-        }
-
-        private void Start()
-        {
-            SubscribeToDiscordListener();
-
-            // The navigation component may have entered its first step before
-            // this component subscribed, so explicitly process the current step.
-            if (_navigation?.CurrentStep != null)
-                OnStepChanged(_navigation.CurrentStep);
+            _lastHandledStep = null;
+            _initialStepSyncRoutine = StartCoroutine(SynchronizeCurrentStepAfterNavigationReset());
         }
 
         private void OnDisable()
         {
+            if (_initialStepSyncRoutine != null)
+            {
+                StopCoroutine(_initialStepSyncRoutine);
+                _initialStepSyncRoutine = null;
+            }
+
+            _lastHandledStep = null;
             UnsubscribeFromDiscordListener();
             _gameManager?.DiscordAnswerListener?.StopListening();
 
@@ -130,58 +93,33 @@ namespace RevealGame.UI
                 _navigation.Finished -= OnFinished;
             }
 
-            if (_preGamePreviewView != null)
-            {
-                _preGamePreviewView.NextRequested -= _navigation.Next;
-                _preGamePreviewView.PreviousRequested -= _navigation.Previous;
-            }
-
             if (_hintView != null)
-            {
                 _hintView.AnswerSubmitted -= OnHintAnswerSubmitted;
-                _hintView.BackRequested -= _navigation.Previous;
-            }
-
-            if (_answerPopupView != null)
-                _answerPopupView.Dismissed -= _navigation.Next;
-
-            if (_rouletteDisplay != null)
-                _rouletteDisplay.ContinueRequested -= _navigation.Next;
-
-            if (_postGamePreviewView != null)
-                _postGamePreviewView.NextRequested -= _navigation.Next;
         }
 
         private void OnStepChanged(HintGameNavigationStep step)
         {
-            if (_isHandlingStep || step == null)
+            if (_isHandlingStep || step == null || step == _lastHandledStep)
                 return;
 
+            _lastHandledStep = step;
             _isHandlingStep = true;
             try
             {
-                HideInactiveViews(step);
+                if (!step.TryGetComponent<HintGameView>(out _) && _hintIsActive)
+                {
+                    _hintIsActive = false;
+                    _gameManager?.DiscordAnswerListener?.StopListening();
+                }
 
-                if (IsStepFor(step, _preGamePreviewView))
-                {
-                    ShowPreGamePreview();
-                }
-                else if (IsStepFor(step, _hintView))
-                {
-                    BeginHintGame();
-                }
-                else if (IsStepFor(step, _answerPopupView))
-                {
-                    ShowCorrectAnswerPopup();
-                }
-                else if (IsStepFor(step, _rouletteDisplay))
-                {
-                    StartReveal();
-                }
-                else if (IsStepFor(step, _postGamePreviewView))
-                {
-                    ShowPostGamePreview();
-                }
+                if (step.TryGetComponent<ItemPreviewView>(out var previewView))
+                    ShowItemPreview(previewView);
+                else if (step.TryGetComponent<HintGameView>(out var hintView))
+                    BeginHintGame(hintView);
+                else if (step.TryGetComponent<AnswerPopupView>(out var answerPopupView))
+                    ShowCorrectAnswerPopup(answerPopupView);
+                else if (step.TryGetComponent<RouletteDisplay>(out var rouletteDisplay))
+                    StartReveal(rouletteDisplay);
             }
             finally
             {
@@ -189,44 +127,32 @@ namespace RevealGame.UI
             }
         }
 
-        private void HideInactiveViews(HintGameNavigationStep activeStep)
+        private IEnumerator SynchronizeCurrentStepAfterNavigationReset()
         {
-            if (!IsStepFor(activeStep, _hintView) && _hintIsActive)
-            {
-                _hintIsActive = false;
-                _gameManager?.DiscordAnswerListener?.StopListening();
-            }
+            // The controller resets its current step from OnEnable. Waiting one frame
+            // prevents processing the previous screen entry's final step, while also
+            // covering the case where its StepChanged event ran before our subscription.
+            yield return null;
 
-            if (!IsStepFor(activeStep, _preGamePreviewView))
-                _preGamePreviewView?.SetVisible(false);
-            if (!IsStepFor(activeStep, _hintView))
-                _hintView?.SetVisible(false);
-            if (!IsStepFor(activeStep, _answerPopupView))
-                _answerPopupView?.Hide();
-            if (!IsStepFor(activeStep, _rouletteDisplay))
-                _rouletteDisplay?.Dispose();
-            if (!IsStepFor(activeStep, _postGamePreviewView))
-                _postGamePreviewView?.SetVisible(false);
+            if (isActiveAndEnabled && _navigation?.CurrentStep != null)
+                OnStepChanged(_navigation.CurrentStep);
+
+            _initialStepSyncRoutine = null;
         }
 
-        private void ShowPreGamePreview()
+        private void ShowItemPreview(ItemPreviewView previewView)
         {
-            if (_preGamePreviewView == null)
-            {
-                _navigation.Next();
-                return;
-            }
-
+            previewView.Setup(_gameManager);
             var contents = HasConfiguredGame
                 ? _gameManager.LootboxEngine.GetCurrentContents()
                 : new List<Data.ItemData>();
-            _preGamePreviewView.Show(contents);
-            _preGamePreviewView.SetPreviousInteractable(_navigation.CanPrevious);
+            previewView.Show(contents);
+            previewView.SetPreviousInteractable(_navigation.CanPrevious);
         }
 
-        private void BeginHintGame()
+        private void BeginHintGame(HintGameView hintView)
         {
-            if (!HasConfiguredGame || _hintView == null)
+            if (!HasConfiguredGame)
             {
                 Debug.LogWarning("[HintGameOpeningCoordinator] Cannot begin hint game until a game is configured.");
                 return;
@@ -234,45 +160,23 @@ namespace RevealGame.UI
 
             _gameManager.HintGameEngine.GetOrAssignHint();
             _hintIsActive = true;
-            _hintView.SetVisible(true);
-            _hintView.SetPreviousInteractable(_navigation.CanPrevious);
-            _hintView.ShowHint(_gameManager.HintGameEngine.GetCurrentHint());
+            hintView.Setup(_gameManager);
+            hintView.SetVisible(true);
+            hintView.SetPreviousInteractable(_navigation.CanPrevious);
+            hintView.ShowHint(_gameManager.HintGameEngine.GetCurrentHint());
         }
 
-        private void ShowCorrectAnswerPopup()
+        private void ShowCorrectAnswerPopup(AnswerPopupView answerPopupView)
         {
-            if (_answerPopupView == null)
-            {
-                _navigation.Next();
-                return;
-            }
-
-            _answerPopupView.Show(_pendingAnswerMessage ?? string.Empty, 3f);
+            answerPopupView.Setup(_gameManager);
+            answerPopupView.Show(_pendingAnswerMessage ?? string.Empty, 3f);
         }
 
-        private void StartReveal()
+        private void StartReveal(RouletteDisplay rouletteDisplay)
         {
-            if (_rouletteDisplay == null)
-            {
-                _navigation.Next();
-                return;
-            }
-
+            rouletteDisplay.Setup(_gameManager);
             if (_revealRoutine == null)
-                _revealRoutine = StartCoroutine(OpenLootboxRoutine());
-        }
-
-        private void ShowPostGamePreview()
-        {
-            if (_postGamePreviewView == null)
-            {
-                _navigation.Next();
-                return;
-            }
-
-            _postGamePreviewView.Show(_gameManager?.LootboxEngine?.GetCurrentWinners()
-                ?? new List<Data.ItemData>());
-            _postGamePreviewView.SetPreviousInteractable(_navigation.CanPrevious);
+                _revealRoutine = StartCoroutine(OpenLootboxRoutine(rouletteDisplay));
         }
 
         private void OnHintAnswerSubmitted(string answer)
@@ -304,10 +208,10 @@ namespace RevealGame.UI
             _hintView?.SetVisible(false);
             _gameManager.DiscordAnswerListener?.StopListening();
             _pendingAnswerMessage = _gameManager.Session.Config.settings.FormatCorrectAnswer(username, answer);
-            _navigation.Next();
+            _hintView?.GetComponent<HintGameNavigationStep>()?.RequestNext();
         }
 
-        private IEnumerator OpenLootboxRoutine()
+        private IEnumerator OpenLootboxRoutine(RouletteDisplay rouletteDisplay)
         {
             IReadOnlyList<string> rewardItemIds;
             try
@@ -317,14 +221,13 @@ namespace RevealGame.UI
             catch (Exception exception)
             {
                 Debug.LogException(exception);
-                _rouletteDisplay.ShowFailure(Settings?.FormatLootboxOpenFailed()
+                rouletteDisplay.ShowFailure(Settings?.FormatLootboxOpenFailed()
                     ?? Data.GameSettings.DefaultLootboxOpenFailedFormat);
                 _revealRoutine = null;
                 yield break;
             }
 
-            yield return StartCoroutine(_rouletteDisplay.Play(rewardItemIds));
-            _rouletteDisplay.ShowSummary(_rouletteDisplay.CollectedRewardTitles);
+            yield return StartCoroutine(rouletteDisplay.Play(rewardItemIds));
             _revealRoutine = null;
         }
 
@@ -350,10 +253,7 @@ namespace RevealGame.UI
                 _gameManager.CompleteLootboxOpening();
         }
 
-        private bool IsStepFor<T>(HintGameNavigationStep step, T view) where T : Component
-            => step != null && view != null && step.gameObject == view.gameObject;
-
-        private T FindPhaseView<T>() where T : Component
+        private T FindStepView<T>() where T : Component
             => GetComponentInChildren<T>(true)
                 ?? FindAnyObjectByType<T>(FindObjectsInactive.Include);
 
