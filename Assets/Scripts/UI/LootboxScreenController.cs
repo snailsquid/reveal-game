@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,7 +16,12 @@ namespace RevealGame.UI
         [SerializeField] private GameManager _gameManager;
         [SerializeField] private ResponsiveUiLayout _responsiveUiLayout;
 
+        [Header("List Animation")]
+        [SerializeField, Min(0.01f)] private float _lootboxAnimationDuration = 0.22f;
+        [SerializeField, Min(0f)] private float _lootboxAnimationStaggerDelay = 0.08f;
+
         private List<LootboxButtonController> _buttonControllers = new List<LootboxButtonController>();
+        private Sequence _listAnimation;
 
         private void Awake()
         {
@@ -49,11 +55,17 @@ namespace RevealGame.UI
             _responsiveUiLayout?.RefreshLayout();
         }
 
+        private void OnDisable()
+        {
+            StopListAnimation();
+        }
+
         public void RefreshGrid()
         {
             if (_gameManager?.Session?.Config == null)
                 return;
 
+            StopListAnimation();
             foreach (var ctrl in _buttonControllers)
             {
                 if (ctrl != null && ctrl.gameObject != null)
@@ -85,6 +97,20 @@ namespace RevealGame.UI
                     ctrl.ShowWinners(GetWinnerItems(i));
                 _buttonControllers.Add(ctrl);
             }
+
+            _listAnimation = UiStaggeredListAnimator.Play(
+                _lootboxGridContainer,
+                _lootboxAnimationDuration,
+                _lootboxAnimationStaggerDelay);
+        }
+
+        private void StopListAnimation()
+        {
+            if (_listAnimation == null)
+                return;
+
+            _listAnimation.Kill();
+            _listAnimation = null;
         }
 
         private List<Data.ItemData> GetWinnerItems(int lootboxIndex)

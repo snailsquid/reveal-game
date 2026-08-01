@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -20,9 +21,14 @@ namespace RevealGame.UI
         [SerializeField] private Button _continueButton;
         [SerializeField] private Button _previousButton;
 
+        [Header("List Animation")]
+        [SerializeField, Min(0.01f)] private float _itemAnimationDuration = 0.22f;
+        [SerializeField, Min(0f)] private float _itemAnimationStaggerDelay = 0.08f;
+
         private GameManager _gameManager;
         private HintGameNavigationStep _navigationStep;
         private readonly List<ItemPreviewRow> _itemRows = new();
+        private Sequence _listAnimation;
 
         private void Awake()
         {
@@ -32,6 +38,11 @@ namespace RevealGame.UI
                 _continueButton.onClick.AddListener(OnContinueClicked);
             if (_previousButton != null)
                 _previousButton.onClick.AddListener(OnPreviousClicked);
+        }
+
+        private void OnDisable()
+        {
+            StopListAnimation();
         }
 
         public void Setup(GameManager gameManager)
@@ -58,6 +69,11 @@ namespace RevealGame.UI
                     row.Bind(item, _gameManager?.MediaDisplay);
                     _itemRows.Add(row);
                 }
+
+                _listAnimation = UiStaggeredListAnimator.Play(
+                    _itemsContainer,
+                    _itemAnimationDuration,
+                    _itemAnimationStaggerDelay);
             }
         }
 
@@ -75,6 +91,7 @@ namespace RevealGame.UI
 
         private void ClearRows()
         {
+            StopListAnimation();
             foreach (var row in _itemRows)
             {
                 if (row != null)
@@ -82,6 +99,15 @@ namespace RevealGame.UI
             }
 
             _itemRows.Clear();
+        }
+
+        private void StopListAnimation()
+        {
+            if (_listAnimation == null)
+                return;
+
+            _listAnimation.Kill();
+            _listAnimation = null;
         }
 
         private void OnContinueClicked() => _navigationStep?.RequestNext();
