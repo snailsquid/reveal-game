@@ -17,6 +17,13 @@
       },
       "hash": "c14de1e6dc01ab42d2bb358730cff954bce0ce6b"
     },
+    "com.gameframex.unity.demigiant.dotween": {
+      "version": "https://github.com/AlianBlank/com.gameframex.unity.demigiant.dotween.git#1.1.2",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "012a12754dcc305b1395a080d6e1984a8534d4c1"
+    },
     "com.unity.2d.animation": {
       "version": "14.0.3",
       "depth": 0,

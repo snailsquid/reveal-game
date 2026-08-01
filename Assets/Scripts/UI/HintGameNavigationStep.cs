@@ -13,8 +13,8 @@ namespace RevealGame.UI
     {
         [SerializeField] private bool _allowPrevious;
         [SerializeField] private bool _useCanvasGroup;
-        private CanvasGroup _canvasGroup;
         private HintGameUIController _navigation;
+        private UiTransition _transition;
 
         public bool CanGoPrevious => _allowPrevious;
 
@@ -46,33 +46,24 @@ namespace RevealGame.UI
         {
             _allowPrevious = allowPrevious;
             _useCanvasGroup = useCanvasGroup;
-            if (_useCanvasGroup && _canvasGroup == null)
-            {
-                _canvasGroup = GetComponent<CanvasGroup>();
-                if (_canvasGroup == null)
-                    _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-            }
         }
 
-        public void SetActive(bool isActive)
+        public void SetActive(bool isActive, System.Action onComplete = null)
         {
-            if (_useCanvasGroup)
+            _transition ??= UiTransition.GetOrAdd(gameObject);
+            if (isActive)
             {
-                if (_canvasGroup == null)
-                {
-                    _canvasGroup = GetComponent<CanvasGroup>();
-                    if (_canvasGroup == null)
-                        _canvasGroup = gameObject.AddComponent<CanvasGroup>();
-                }
-
-                _canvasGroup.alpha = isActive ? 1f : 0f;
-                _canvasGroup.interactable = isActive;
-                _canvasGroup.blocksRaycasts = isActive;
+                _transition.Show(onComplete);
                 return;
             }
 
-            if (gameObject.activeSelf != isActive)
-                gameObject.SetActive(isActive);
+            _transition.Hide(onComplete);
+        }
+
+        internal void SetInactiveImmediately()
+        {
+            _transition ??= UiTransition.GetOrAdd(gameObject);
+            _transition.SetVisibleImmediately(false);
         }
     }
 }

@@ -23,10 +23,12 @@ namespace RevealGame.UI
         private int _index;
         private Action<int> _onClick;
         private readonly List<GameObject> _winnerInstances = new List<GameObject>();
+        private UiTransition _tooltipTransition;
 
         private void Awake()
         {
             if (_button == null) _button = GetComponent<Button>();
+            _tooltipTransition = UiTransition.GetOrAdd(_tooltip);
         }
 
         /// <summary>
@@ -49,7 +51,7 @@ namespace RevealGame.UI
 
             ClearWinnerInstances();
             if (_tooltip != null)
-                _tooltip.SetActive(false);
+                _tooltipTransition?.SetVisibleImmediately(false);
 
             // Remove old listeners and add new one
             if (_button != null)
@@ -68,7 +70,8 @@ namespace RevealGame.UI
                 return;
 
             ClearWinnerInstances();
-            _tooltip.SetActive(true);
+            _tooltipTransition ??= UiTransition.GetOrAdd(_tooltip);
+            _tooltipTransition.Show();
 
             if (_winnerContainer == null || _winnerPrefab == null || winners == null)
                 return;

@@ -19,6 +19,7 @@ namespace RevealGame.UI
         private GameManager _gameManager;
         private Coroutine _autoDismissCoroutine;
         private HintGameNavigationStep _navigationStep;
+        private UiTransition _transition;
 
         private Data.GameSettings Settings
             => _gameManager?.Session?.Config?.settings;
@@ -33,7 +34,10 @@ namespace RevealGame.UI
             _navigationStep = GetComponent<HintGameNavigationStep>();
 
             if (_popupRoot != null)
-                _popupRoot.SetActive(false);
+            {
+                _transition = UiTransition.GetOrAdd(_popupRoot);
+                _transition.SetVisibleImmediately(false);
+            }
 
             if (_continueButton != null)
                 _continueButton.onClick.AddListener(OnContinueClicked);
@@ -82,7 +86,8 @@ namespace RevealGame.UI
             if (_resultText != null)
                 _resultText.text = messageText;
 
-            _popupRoot.SetActive(true);
+            _transition ??= UiTransition.GetOrAdd(_popupRoot);
+            _transition.Show();
 
             float dismissDelay = displayDuration > 0f ? displayDuration : _autoDismissDelay;
             if (_autoDismiss && dismissDelay > 0f)
@@ -95,30 +100,47 @@ namespace RevealGame.UI
 
         public void Hide()
         {
-            if (_popupRoot != null)
-                _popupRoot.SetActive(false);
-
             if (_autoDismissCoroutine != null)
             {
                 StopCoroutine(_autoDismissCoroutine);
                 _autoDismissCoroutine = null;
             }
+
+            _transition?.Hide();
         }
 
         private void OnContinueClicked()
         {
-            Hide();
-            _navigationStep?.RequestNext();
-            Dismissed?.Invoke();
+            DismissAndAdvance();
         }
 
         private IEnumerator AutoDismissCoroutine(float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
             _autoDismissCoroutine = null;
-            Hide();
-            _navigationStep?.RequestNext();
-            Dismissed?.Invoke();
+            DismissAndAdvance();
+        }
+
+        private void DismissAndAdvance()
+        {
+            if (_autoDismissCoroutine != null)
+            {
+                StopCoroutine(_autoDismissCoroutine);
+                _autoDismissCoroutine = null;
+            }
+
+            if (_transition == null)
+            {
+                _navigationStep?.RequestNext();
+                Dismissed?.Invoke();
+                return;
+            }
+
+            _transition.Hide(() =>
+            {
+                _navigationStep?.RequestNext();
+                Dismissed?.Invoke();
+            });
         }
     }
 }

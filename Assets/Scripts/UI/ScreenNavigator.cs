@@ -62,12 +62,21 @@ namespace RevealGame.UI
                 return;
             }
 
-            if (_titleScreen != null)
-                _titleScreen.SetActive(_titleScreen == activeScreen);
-            if (_lootboxScreen != null)
-                _lootboxScreen.SetActive(_lootboxScreen == activeScreen);
-            if (_hintGameScreen != null)
-                _hintGameScreen.SetActive(_hintGameScreen == activeScreen);
+            TransitionScreen(_titleScreen, _titleScreen == activeScreen);
+            TransitionScreen(_lootboxScreen, _lootboxScreen == activeScreen);
+            TransitionScreen(_hintGameScreen, _hintGameScreen == activeScreen);
+        }
+
+        private static void TransitionScreen(GameObject screen, bool shouldShow)
+        {
+            if (screen == null)
+                return;
+
+            var transition = UiTransition.GetOrAdd(screen);
+            if (shouldShow)
+                transition.Show();
+            else if (screen.activeSelf)
+                transition.Hide();
         }
 
         private static GameObject FindScreenChild(Transform root, string name)

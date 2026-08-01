@@ -58,8 +58,7 @@ namespace RevealGame.UI
 
             if (_currentIndex >= _steps.Length - 1)
             {
-                CurrentStep.SetActive(false);
-                Finished?.Invoke();
+                CurrentStep.SetActive(false, () => Finished?.Invoke());
                 return;
             }
 
@@ -77,8 +76,7 @@ namespace RevealGame.UI
 
             if (_currentIndex == 0)
             {
-                CurrentStep.SetActive(false);
-                ExitRequested?.Invoke();
+                CurrentStep.SetActive(false, () => ExitRequested?.Invoke());
                 return;
             }
 
@@ -103,9 +101,11 @@ namespace RevealGame.UI
             if (targetIndex < 0 || targetIndex >= _steps.Length || targetIndex == _currentIndex)
                 return;
 
-            CurrentStep?.SetActive(false);
-            _currentIndex = targetIndex;
-            SetCurrentStepActive();
+            CurrentStep?.SetActive(false, () =>
+            {
+                _currentIndex = targetIndex;
+                SetCurrentStepActive();
+            });
         }
 
         private void SetCurrentStepActive()
@@ -117,7 +117,7 @@ namespace RevealGame.UI
         private void SetAllStepsInactive()
         {
             foreach (var step in _steps)
-                step?.SetActive(false);
+                step?.SetInactiveImmediately();
         }
     }
 }

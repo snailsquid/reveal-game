@@ -51,10 +51,15 @@ namespace RevealGame.UI
         private readonly List<RouletteWinnerSlot> _winnerSlots = new List<RouletteWinnerSlot>();
         private float _currentPosition = 0f;
         private bool _winnerConfirmationAdvanceRequested;
+        private UiTransition _rouletteTransition;
+        private UiTransition _winnerConfirmationTransition;
 
         private void Awake()
         {
             _navigationStep = GetComponent<HintGameNavigationStep>();
+            _rouletteTransition = UiTransition.GetOrAdd(_rouletteRoot);
+            _winnerConfirmationTransition = UiTransition.GetOrAdd(_winnerConfirmationScreen);
+            _winnerConfirmationTransition?.SetVisibleImmediately(false);
         }
 
         public void Setup(GameManager gameManager)
@@ -75,10 +80,10 @@ namespace RevealGame.UI
 
         public IEnumerator Play(IReadOnlyList<string> rewardItemIds)
         {
-            if (_rouletteRoot != null)
-                _rouletteRoot.SetActive(true);
+            _rouletteTransition ??= UiTransition.GetOrAdd(_rouletteRoot);
+            _rouletteTransition?.Show();
 
-            HideWinnerConfirmation();
+            HideWinnerConfirmationImmediately();
             BuildWinnerSlots(rewardItemIds);
 
             if (rewardItemIds == null)
@@ -122,12 +127,15 @@ namespace RevealGame.UI
             Hide();
         }
 
-        private void Hide()
+        private void Hide(System.Action onComplete = null)
         {
-            HideWinnerConfirmation();
+            HideWinnerConfirmationImmediately();
 
-            if (_rouletteRoot != null)
-                _rouletteRoot.SetActive(false);
+            _rouletteTransition ??= UiTransition.GetOrAdd(_rouletteRoot);
+            if (_rouletteTransition != null)
+                _rouletteTransition.Hide(onComplete);
+            else
+                onComplete?.Invoke();
         }
 
         private IEnumerator SpinReelForReward(string rewardItemId, RouletteWinnerSlot winnerSlot)
@@ -191,16 +199,32 @@ namespace RevealGame.UI
                 _winnerConfirmationNextLabel.text = isLastReward ? "Back to Lootboxes" : "Next Winner";
 
             _winnerConfirmationAdvanceRequested = false;
-            _winnerConfirmationScreen.SetActive(true);
+            _winnerConfirmationTransition ??= UiTransition.GetOrAdd(_winnerConfirmationScreen);
+            _winnerConfirmationTransition.Show();
 
             yield return new WaitUntil(() => _winnerConfirmationAdvanceRequested);
-            HideWinnerConfirmation();
+            yield return StartCoroutine(HideWinnerConfirmation());
         }
 
-        private void HideWinnerConfirmation()
+        private IEnumerator HideWinnerConfirmation()
         {
-            if (_winnerConfirmationScreen != null)
-                _winnerConfirmationScreen.SetActive(false);
+            if (_winnerConfirmationTransition == null || !_winnerConfirmationScreen.activeSelf)
+            {
+                _winnerConfirmationAdvanceRequested = false;
+                yield break;
+            }
+
+            bool completed = false;
+            _winnerConfirmationTransition.Hide(() => completed = true);
+            yield return new WaitUntil(() => completed);
+
+            _winnerConfirmationAdvanceRequested = false;
+        }
+
+        private void HideWinnerConfirmationImmediately()
+        {
+            _winnerConfirmationTransition ??= UiTransition.GetOrAdd(_winnerConfirmationScreen);
+            _winnerConfirmationTransition?.SetVisibleImmediately(false);
 
             _winnerConfirmationAdvanceRequested = false;
         }
@@ -377,8 +401,7 @@ namespace RevealGame.UI
 
         private void CompleteDisplay()
         {
-            Hide();
-            _navigationStep?.RequestNext();
+            Hide(() => _navigationStep?.RequestNext());
         }
 
         private List<Data.ItemData> GetReelItems()

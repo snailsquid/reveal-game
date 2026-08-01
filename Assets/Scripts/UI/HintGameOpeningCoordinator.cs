@@ -205,7 +205,6 @@ namespace RevealGame.UI
             }
 
             _hintIsActive = false;
-            _hintView?.SetVisible(false);
             _gameManager.DiscordAnswerListener?.StopListening();
             _pendingAnswerMessage = _gameManager.Session.Config.settings.FormatCorrectAnswer(username, answer);
             _hintView?.GetComponent<HintGameNavigationStep>()?.RequestNext();
