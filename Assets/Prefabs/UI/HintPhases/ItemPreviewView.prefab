@@ -92,8 +92,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 34.7
+  m_fontSizeBase: 34.7
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -652,6 +652,8 @@ MonoBehaviour:
   _itemRowPrefab: {fileID: 7061664167354615032, guid: 5581ee8c97104e69d873085f2abbe090, type: 3}
   _continueButton: {fileID: 5897305962452063125}
   _previousButton: {fileID: 4592617910249886548}
+  _itemAnimationDuration: 0.22
+  _itemAnimationStaggerDelay: 0.08
 --- !u!114 &2848572267446666999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -700,10 +702,10 @@ RectTransform:
   - {fileID: 5692177437175930930}
   m_Father: {fileID: 7558108174975976309}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 407, y: -124.186615}
-  m_SizeDelta: {x: 84.2026, y: 28.1151}
+  m_AnchorMin: {x: 0.7551962, y: 0.32137498}
+  m_AnchorMax: {x: 0.82900006, y: 0.37632295}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2196643648043132254
 CanvasRenderer:

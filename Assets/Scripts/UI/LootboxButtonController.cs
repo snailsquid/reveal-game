@@ -28,6 +28,7 @@ namespace RevealGame.UI
         private void Awake()
         {
             if (_button == null) _button = GetComponent<Button>();
+            ButtonInteractionAnimation.EnsureAttached(_button);
             _tooltipTransition = UiTransition.GetOrAdd(_tooltip);
         }
 

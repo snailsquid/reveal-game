@@ -54,6 +54,7 @@ namespace RevealGame.UI
         {
             _isPointerOver = false;
             KillScaleTween();
+            transform.localScale = _restScale;
         }
 
         private void OnDestroy()
