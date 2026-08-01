@@ -55,7 +55,10 @@ namespace RevealGame.UI
             _lootboxGrid.spacing = new Vector2(CellSpacing, CellSpacing);
             _lootboxGrid.padding = new RectOffset((int)HorizontalPadding, (int)HorizontalPadding, 16, 16);
             _lootboxGrid.cellSize = new Vector2(cellSize, cellSize * 0.78f);
-            LayoutRebuilder.ForceRebuildLayoutImmediate(_lootboxGridRect);
+
+            // GridLayoutGroup marks itself dirty when these values change. Let the Canvas run
+            // that rebuild in its next layout pass rather than forcing one while graphics may
+            // be rebuilding (which causes re-entrant Image graphic rebuild warnings).
         }
 
         private void ConfigureCanvas()

@@ -386,6 +386,8 @@ MonoBehaviour:
   _backButton: {fileID: 0}
   _gameManager: {fileID: 0}
   _responsiveUiLayout: {fileID: 0}
+  _lootboxAnimationDuration: 0.22
+  _lootboxAnimationStaggerDelay: 0.08
 --- !u!1 &5356382989143468475
 GameObject:
   m_ObjectHideFlags: 0
@@ -607,7 +609,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 32, y: 0.0000038147}
+  m_AnchoredPosition: {x: 0.0289917, y: 0.0000038147}
   m_SizeDelta: {x: 0, y: 827.9301}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &1850349820651670899

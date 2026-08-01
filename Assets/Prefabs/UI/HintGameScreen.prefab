@@ -208,10 +208,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1000000004, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
-      propertyPath: _winnerSlotsContainer
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 1000000012, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
@@ -228,9 +224,32 @@ PrefabInstance:
       propertyPath: m_AnchorMin.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9000000001, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9000000012, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9000000012, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9000000042, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 10.576274
+      objectReference: {fileID: 0}
+    - target: {fileID: 7632105584537790149, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7632105584537790149, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0.33850098
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 8224570777116016889, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1000000001, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace RevealGame.UI
@@ -17,13 +18,11 @@ namespace RevealGame.UI
         [Header("Winner Confirmation")]
         [Tooltip("Prefab-authored panel shown after each reward. The Next button must call ContinueAfterWinner.")]
         [SerializeField] private GameObject _winnerConfirmationScreen;
-        [SerializeField] private TMP_Text _winnerConfirmationText;
+        [FormerlySerializedAs("_winnerConfirmationText")]
+        [SerializeField] private TMP_Text _winnerConfirmationGameText;
+        [SerializeField] private TMP_Text _winnerConfirmationDeveloperText;
         [SerializeField] private Image _winnerConfirmationImage;
         [SerializeField] private TMP_Text _winnerConfirmationNextLabel;
-
-        [Header("Winner Slots")]
-        [SerializeField] private Transform _winnerSlotsContainer;
-        [SerializeField] private RouletteWinnerSlot _winnerSlotPrefab;
 
         [Header("Reel Settings")]
         [SerializeField] private int _totalItemsOnReel = 40;
@@ -48,7 +47,6 @@ namespace RevealGame.UI
         private HintGameNavigationStep _navigationStep;
         private IReadOnlyList<Data.ItemData> _testItems;
         private List<GameObject> _reelItems = new List<GameObject>();
-        private readonly List<RouletteWinnerSlot> _winnerSlots = new List<RouletteWinnerSlot>();
         private float _currentPosition = 0f;
         private bool _winnerConfirmationAdvanceRequested;
         private UiTransition _rouletteTransition;
@@ -84,8 +82,6 @@ namespace RevealGame.UI
             _rouletteTransition?.Show();
 
             HideWinnerConfirmationImmediately();
-            BuildWinnerSlots(rewardItemIds);
-
             if (rewardItemIds == null)
             {
                 CompleteDisplay();
@@ -94,12 +90,8 @@ namespace RevealGame.UI
 
             for (int rewardIndex = 0; rewardIndex < rewardItemIds.Count; rewardIndex++)
             {
-                RouletteWinnerSlot winnerSlot = rewardIndex < _winnerSlots.Count
-                    ? _winnerSlots[rewardIndex]
-                    : null;
-
                 bool isLastReward = rewardIndex == rewardItemIds.Count - 1;
-                yield return StartCoroutine(SpinReelForReward(rewardItemIds[rewardIndex], winnerSlot));
+                yield return StartCoroutine(SpinReelForReward(rewardItemIds[rewardIndex]));
                 yield return StartCoroutine(WaitForWinnerConfirmation(rewardItemIds[rewardIndex], isLastReward));
             }
 
@@ -138,7 +130,7 @@ namespace RevealGame.UI
                 onComplete?.Invoke();
         }
 
-        private IEnumerator SpinReelForReward(string rewardItemId, RouletteWinnerSlot winnerSlot)
+        private IEnumerator SpinReelForReward(string rewardItemId)
         {
             ClearReel();
             BuildReel(rewardItemId);
@@ -170,7 +162,6 @@ namespace RevealGame.UI
 
             var reward = GetItemById(rewardItemId);
             string rewardTitle = reward != null ? reward.title : rewardItemId;
-            winnerSlot?.Reveal(ResolveItemSprite(reward));
             if (_statusText != null)
                 _statusText.text = $"Won: {rewardTitle}";
 
@@ -188,8 +179,10 @@ namespace RevealGame.UI
 
             Data.ItemData reward = GetItemById(rewardItemId);
             string rewardTitle = reward != null ? reward.title : rewardItemId;
-            if (_winnerConfirmationText != null)
-                _winnerConfirmationText.text = $"You won!\n{rewardTitle}";
+            if (_winnerConfirmationGameText != null)
+                _winnerConfirmationGameText.text = rewardTitle ?? string.Empty;
+            if (_winnerConfirmationDeveloperText != null)
+                _winnerConfirmationDeveloperText.text = reward?.teamName ?? string.Empty;
             if (_winnerConfirmationImage != null)
             {
                 _winnerConfirmationImage.sprite = ResolveItemSprite(reward);
@@ -325,24 +318,21 @@ namespace RevealGame.UI
             cardObj.name = $"ReelItem_{index}";
 
             var item = GetItemById(itemId);
-            var rawImage = cardObj.GetComponent<RawImage>();
+            var itemImage = cardObj.transform.Find("ImageContainer/Image")?.GetComponent<Image>();
+            var gameText = cardObj.transform.Find("Game")?.GetComponent<TMP_Text>();
+            var developerText = cardObj.transform.Find("Developer")?.GetComponent<TMP_Text>();
 
-            if (rawImage != null && item != null)
+            if (itemImage != null)
             {
-                var sprite = ResolveItemSprite(item);
-
-                if (sprite != null && sprite.texture != null)
-                {
-                    RenderTexture renderTexture = new RenderTexture(
-                        sprite.texture.width,
-                        sprite.texture.height,
-                        0,
-                        RenderTextureFormat.ARGB32
-                    );
-                    Graphics.Blit(sprite.texture, renderTexture);
-                    rawImage.texture = renderTexture;
-                }
+                itemImage.sprite = item != null ? ResolveItemSprite(item) : null;
+                itemImage.enabled = itemImage.sprite != null;
             }
+
+            if (gameText != null)
+                gameText.text = item?.title ?? string.Empty;
+
+            if (developerText != null)
+                developerText.text = item?.teamName ?? string.Empty;
 
             _reelItems.Add(cardObj);
         }
@@ -371,32 +361,6 @@ namespace RevealGame.UI
             }
             _reelItems.Clear();
             _currentPosition = 0f;
-        }
-
-        private void BuildWinnerSlots(IReadOnlyList<string> rewardItemIds)
-        {
-            ClearWinnerSlots();
-
-            if (rewardItemIds == null || _winnerSlotsContainer == null || _winnerSlotPrefab == null)
-                return;
-
-            foreach (string _ in rewardItemIds)
-            {
-                RouletteWinnerSlot winnerSlot = Instantiate(_winnerSlotPrefab, _winnerSlotsContainer);
-                winnerSlot.ShowPlaceholder();
-                _winnerSlots.Add(winnerSlot);
-            }
-        }
-
-        private void ClearWinnerSlots()
-        {
-            foreach (RouletteWinnerSlot winnerSlot in _winnerSlots)
-            {
-                if (winnerSlot != null)
-                    Destroy(winnerSlot.gameObject);
-            }
-
-            _winnerSlots.Clear();
         }
 
         private void CompleteDisplay()
