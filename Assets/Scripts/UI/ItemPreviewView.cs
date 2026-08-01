@@ -95,7 +95,12 @@ namespace RevealGame.UI
             foreach (var row in _itemRows)
             {
                 if (row != null)
+                {
+                    // Destroy is deferred until the end of the frame. Hide old rows now so
+                    // they cannot consume stagger positions while replacements are created.
+                    row.gameObject.SetActive(false);
                     Destroy(row.gameObject);
+                }
             }
 
             _itemRows.Clear();
