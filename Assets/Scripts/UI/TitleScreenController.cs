@@ -21,8 +21,6 @@ namespace RevealGame.UI
             }
 
             _playButton.onClick.AddListener(OnPlayClicked);
-            var label = _playButton.GetComponentInChildren<Text>(true);
-            if (label != null) label.color = new Color(0.08f, 0.16f, 0.12f);
         }
 
         private void OnPlayClicked()
