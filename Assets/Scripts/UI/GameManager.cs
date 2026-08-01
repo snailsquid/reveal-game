@@ -44,6 +44,7 @@ namespace RevealGame.UI
 
         private void Awake()
         {
+            ButtonInteractionAnimationInstaller.EnsureInstalled();
             _gameSessionCoordinator = new GameSessionCoordinator();
             _gameSessionCoordinator.InitializeSession(GameSession.Instance);
 
