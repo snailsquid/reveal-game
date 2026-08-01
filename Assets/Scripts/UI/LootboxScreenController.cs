@@ -51,7 +51,6 @@ namespace RevealGame.UI
 
         private void OnEnable()
         {
-            RefreshGrid();
             _responsiveUiLayout?.RefreshLayout();
         }
 
@@ -69,7 +68,12 @@ namespace RevealGame.UI
             foreach (var ctrl in _buttonControllers)
             {
                 if (ctrl != null && ctrl.gameObject != null)
+                {
+                    // Destroy is deferred until the end of the frame. Hide old buttons now so
+                    // they cannot consume stagger positions while the replacement grid is built.
+                    ctrl.gameObject.SetActive(false);
                     Destroy(ctrl.gameObject);
+                }
             }
             _buttonControllers.Clear();
 
