@@ -9,6 +9,7 @@ namespace RevealGame.Data
     {
         public string id;
         public string title;
+        public string teamName;
         public string description;
         public string mediaPath;
         public bool isWinner;

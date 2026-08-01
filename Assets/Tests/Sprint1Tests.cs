@@ -190,6 +190,7 @@ namespace RevealGame.Tests
             var items = serialized.FindProperty("_items");
             items.arraySize = 2;
             items.GetArrayElementAtIndex(0).FindPropertyRelative("title").stringValue = "First Item";
+            items.GetArrayElementAtIndex(0).FindPropertyRelative("teamName").stringValue = "First Team";
             items.GetArrayElementAtIndex(1).FindPropertyRelative("title").stringValue = "Second Item";
 
             var hints = serialized.FindProperty("_hints");
@@ -231,6 +232,7 @@ namespace RevealGame.Tests
             Assert.AreEqual(2, config.items.Length);
             Assert.AreEqual("item_0", config.items[0].id);
             Assert.AreEqual("item_1", config.items[1].id);
+            Assert.AreEqual("First Team", config.items[0].teamName);
             Assert.AreEqual(1, config.hints.Length);
             Assert.AreEqual("hint_0", config.hints[0].id);
             UnityEngine.Object.DestroyImmediate(so);

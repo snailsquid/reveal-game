@@ -37,7 +37,7 @@ MonoBehaviour:
   _rewardRevealedFormat: 'Reward {index} of {count}
 
     {title}'
-  _lootboxLabelFormat: Box {index}
+  _lootboxLabelFormat: '{index}'
   _openedNoPrizeFormat: 'Opened
 
     No prize'

@@ -45,6 +45,7 @@ namespace RevealGame.Data
         public class ItemEntry
         {
             public string title;
+            public string teamName;
             public Sprite image;
             public VideoClip video;
             public bool isWinner;

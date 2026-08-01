@@ -168,10 +168,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7558108174975976309}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -249.3972, y: -7.9363}
-  m_SizeDelta: {x: 748.6353, y: 668.2411}
+  m_AnchorMin: {x: 0.042267937, y: 0.053604167}
+  m_AnchorMax: {x: 0.5904642, y: 0.924}
+  m_AnchoredPosition: {x: 1.1027832, y: 0.5636902}
+  m_SizeDelta: {x: -0.36468506, y: -0.75891113}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1571532851427138363
 MonoBehaviour:
@@ -190,13 +190,13 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
+  m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 100, y: 100}
-  m_Spacing: {x: 0, y: 0}
-  m_Constraint: 0
-  m_ConstraintCount: 2
+  m_CellSize: {x: 352, y: 198}
+  m_Spacing: {x: 13.3, y: 53.87}
+  m_Constraint: 1
+  m_ConstraintCount: 3
 --- !u!1 &2103128577891437665
 GameObject:
   m_ObjectHideFlags: 0
@@ -367,10 +367,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 7558108174975976309}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 407, y: 0}
-  m_SizeDelta: {x: 533, y: 206}
+  m_AnchorMin: {x: 0.5993397, y: 0.37632295}
+  m_AnchorMax: {x: 0.9928039, y: 0.6324897}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2192080693063677799
 CanvasRenderer:
@@ -402,7 +402,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 8054484432257240910, guid: a855ff70f19cd03979238d6ff4e2b34d, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -616,7 +616,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5312318369305704190}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -645,7 +645,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a1d1a3cb76f4f5095e36d5c4c7794e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RevealGame::RevealGame.UI.ItemPreviewView
-  _phase: 0
   _title: Rewards
   _titleText: {fileID: 2765401703622292031}
   _emptyText: {fileID: 6365287947844360601}

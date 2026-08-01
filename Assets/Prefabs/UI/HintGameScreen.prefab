@@ -208,6 +208,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1000000004, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
+      propertyPath: _winnerSlotsContainer
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 1000000012, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
       propertyPath: m_AnchorMax.x
       value: 1
@@ -225,7 +229,8 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8224570777116016889, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 1000000001, guid: 4d4fbf88a0c8434ea3ad2d31cc7a9a52, type: 3}

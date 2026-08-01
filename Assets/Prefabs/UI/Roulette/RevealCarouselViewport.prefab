@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 4009840750559632376}
   - component: {fileID: 3862163603429189816}
   - component: {fileID: 4029981732246303702}
+  - component: {fileID: 1008335331583878174}
   m_Layer: 0
   m_Name: RevealCarouselViewport
   m_TagString: Untagged
@@ -106,6 +107,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: RevealGame::RevealGame.UI.RevealCarouselViewport
   _selectionMarker: {fileID: 173642365995649309}
   _cardPrefab: {fileID: 7307287331384211277, guid: 071a9f7373dd814b6bb01ba670863342, type: 3}
+--- !u!114 &1008335331583878174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4397732864004667513}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
+  m_HorizontalFit: 2
+  m_VerticalFit: 2
 --- !u!1 &6734558446269453575
 GameObject:
   m_ObjectHideFlags: 0
