@@ -14,6 +14,8 @@ namespace RevealGame.UI
         [SerializeField] private Transform _reelContainer;
         [SerializeField] private GameObject _itemCardPrefab;
         [SerializeField] private Text _statusText;
+        [Tooltip("Fixed visual indicator above the reel. Its authored rotation must point upward.")]
+        [SerializeField] private RectTransform _pointer;
 
         [Header("Winner Confirmation")]
         [Tooltip("Prefab-authored panel shown after each reward. The Next button must call ContinueAfterWinner.")]
@@ -43,6 +45,14 @@ namespace RevealGame.UI
         [Min(0f)]
         [SerializeField] private float _rewardDisplayDuration = 1f;
 
+        [Header("Pointer Tick")]
+        [Tooltip("Positive values rotate left when the pointer graphic faces upward.")]
+        [SerializeField] private float _pointerTickAngle = 15f;
+        [Min(0f)]
+        [SerializeField] private float _pointerTickForwardDuration = 0.035f;
+        [Min(0f)]
+        [SerializeField] private float _pointerTickReturnDuration = 0.16f;
+
         private GameManager _gameManager;
         private HintGameNavigationStep _navigationStep;
         private IReadOnlyList<Data.ItemData> _testItems;
@@ -51,6 +61,8 @@ namespace RevealGame.UI
         private bool _winnerConfirmationAdvanceRequested;
         private UiTransition _rouletteTransition;
         private UiTransition _winnerConfirmationTransition;
+        private Coroutine _pointerTickCoroutine;
+        private Quaternion _pointerRestingRotation;
 
         private void Awake()
         {
@@ -58,6 +70,12 @@ namespace RevealGame.UI
             _rouletteTransition = UiTransition.GetOrAdd(_rouletteRoot);
             _winnerConfirmationTransition = UiTransition.GetOrAdd(_winnerConfirmationScreen);
             _winnerConfirmationTransition?.SetVisibleImmediately(false);
+            CachePointerRestingRotation();
+        }
+
+        private void OnDisable()
+        {
+            ResetPointerTick();
         }
 
         public void Setup(GameManager gameManager)
@@ -122,6 +140,7 @@ namespace RevealGame.UI
         private void Hide(System.Action onComplete = null)
         {
             HideWinnerConfirmationImmediately();
+            ResetPointerTick();
 
             _rouletteTransition ??= UiTransition.GetOrAdd(_rouletteRoot);
             if (_rouletteTransition != null)
@@ -145,18 +164,22 @@ namespace RevealGame.UI
 
             while (elapsed < spinDuration)
             {
+                float previousPosition = _currentPosition;
                 elapsed += Time.deltaTime;
                 float normalizedTime = Mathf.Clamp01(elapsed / spinDuration);
                 float progress = EvaluateSpinProgress(normalizedTime);
 
                 _currentPosition = Mathf.LerpUnclamped(startPosition, targetPosition, progress);
                 UpdateReelPosition();
+                TriggerPointerTicksForCrossedBoundaries(previousPosition, _currentPosition);
 
                 yield return null;
             }
 
+            float positionBeforeFinalUpdate = _currentPosition;
             _currentPosition = targetPosition;
             UpdateReelPosition();
+            TriggerPointerTicksForCrossedBoundaries(positionBeforeFinalUpdate, _currentPosition);
 
             yield return new WaitForSecondsRealtime(Mathf.Max(0f, _revealPauseDuration));
 
@@ -352,8 +375,100 @@ namespace RevealGame.UI
             }
         }
 
+        /// <summary>
+        /// Treats every boundary between two reel cards as an invisible pin. The reel only
+        /// produces a tick while it moves left, so easing overshoot cannot generate reverse ticks.
+        /// </summary>
+        private void TriggerPointerTicksForCrossedBoundaries(float previousPosition, float currentPosition)
+        {
+            if (_pointer == null || _itemSpacing <= 0f || currentPosition <= previousPosition)
+                return;
+
+            for (int itemIndex = 0; itemIndex < _reelItems.Count - 1; itemIndex++)
+            {
+                float boundaryPosition = ((itemIndex + 0.5f) * _itemSpacing) - _winningItemTargetX;
+                if (previousPosition < boundaryPosition && boundaryPosition <= currentPosition)
+                    StartPointerTick();
+            }
+        }
+
+        private void StartPointerTick()
+        {
+            if (_pointer == null)
+                return;
+
+            if (_pointerTickCoroutine != null)
+                StopCoroutine(_pointerTickCoroutine);
+
+            _pointerTickCoroutine = StartCoroutine(PointerTickRoutine());
+        }
+
+        private IEnumerator PointerTickRoutine()
+        {
+            Quaternion tickRotation = _pointerRestingRotation * Quaternion.Euler(0f, 0f, _pointerTickAngle);
+            Quaternion startRotation = _pointer.localRotation;
+
+            yield return RotatePointer(startRotation, tickRotation, _pointerTickForwardDuration, false);
+            yield return RotatePointer(tickRotation, _pointerRestingRotation, _pointerTickReturnDuration, true);
+
+            _pointer.localRotation = _pointerRestingRotation;
+            _pointerTickCoroutine = null;
+        }
+
+        private IEnumerator RotatePointer(Quaternion from, Quaternion to, float duration, bool useBackEasing)
+        {
+            if (_pointer == null)
+                yield break;
+
+            if (duration <= 0f)
+            {
+                _pointer.localRotation = to;
+                yield break;
+            }
+
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float normalizedTime = Mathf.Clamp01(elapsed / duration);
+                float progress = useBackEasing ? EaseOutBack(normalizedTime) : normalizedTime;
+                _pointer.localRotation = Quaternion.SlerpUnclamped(from, to, progress);
+                yield return null;
+            }
+
+            _pointer.localRotation = to;
+        }
+
+        private static float EaseOutBack(float normalizedTime)
+        {
+            const float overshoot = 1.70158f;
+            float timeOffset = normalizedTime - 1f;
+            return 1f + ((overshoot + 1f) * timeOffset * timeOffset * timeOffset)
+                + (overshoot * timeOffset * timeOffset);
+        }
+
+        private void CachePointerRestingRotation()
+        {
+            if (_pointer != null)
+                _pointerRestingRotation = _pointer.localRotation;
+        }
+
+        private void ResetPointerTick()
+        {
+            if (_pointerTickCoroutine != null)
+            {
+                StopCoroutine(_pointerTickCoroutine);
+                _pointerTickCoroutine = null;
+            }
+
+            if (_pointer != null)
+                _pointer.localRotation = _pointerRestingRotation;
+        }
+
         private void ClearReel()
         {
+            ResetPointerTick();
+
             foreach (var item in _reelItems)
             {
                 if (item != null)
