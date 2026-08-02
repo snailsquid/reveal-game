@@ -73,6 +73,7 @@ namespace RevealGame.UI
         private bool _winnerConfirmationAdvanceRequested;
         private UiTransition _rouletteTransition;
         private UiTransition _winnerConfirmationTransition;
+        private RouletteConfettiBurst _confettiBurst;
         private Coroutine _pointerTickCoroutine;
         private Quaternion _pointerRestingRotation;
 
@@ -82,6 +83,7 @@ namespace RevealGame.UI
             _rouletteTransition = UiTransition.GetOrAdd(_rouletteRoot);
             _winnerConfirmationTransition = UiTransition.GetOrAdd(_winnerConfirmationScreen);
             _winnerConfirmationTransition?.SetVisibleImmediately(false);
+            _confettiBurst = GetComponent<RouletteConfettiBurst>();
             CachePointerRestingRotation();
         }
 
@@ -170,14 +172,14 @@ namespace RevealGame.UI
             string rewardItemId,
             HashSet<string> previouslyRevealedRewardIds)
         {
-            UiSoundPlayer.PlaySpin();
+            float spinDuration = Mathf.Max(0f, _spinDuration);
+            UiSoundPlayer.PlaySpin(spinDuration);
             ClearReel();
             BuildReel(rewardItemId, previouslyRevealedRewardIds);
 
             float targetPosition = _winningItemIndex * _itemSpacing - _winningItemTargetX;
             float startPosition = 0f;
             float elapsed = 0f;
-            float spinDuration = Mathf.Max(0f, _spinDuration);
 
             if (_statusText != null)
                 _statusText.text = "Spinning...";
@@ -207,6 +209,8 @@ namespace RevealGame.UI
             string rewardTitle = reward != null ? reward.title : rewardItemId;
             if (_statusText != null)
                 _statusText.text = $"Won: {rewardTitle}";
+
+            _confettiBurst?.Play();
 
         }
 

@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1000000003}
   - component: {fileID: 1000000005}
   - component: {fileID: 1000000004}
+  - component: {fileID: 5168476905323267138}
   m_Layer: 0
   m_Name: RouletteDisplay
   m_TagString: Untagged
@@ -107,7 +108,7 @@ MonoBehaviour:
   _winningItemIndex: 35
   _itemSpacing: 1000
   _winningItemTargetX: 50
-  _spinDuration: 12.5
+  _spinDuration: 20
   _spinEasing:
     serializedVersion: 2
     m_Curve:
@@ -150,6 +151,33 @@ MonoBehaviour:
   _pointerSlowFlickDuration: 0.14
   _pointerFastFlickDuration: 0.025
   _pointerTickReturnDuration: 0.16
+--- !u!114 &5168476905323267138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000000001}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da075939e698edcedbceae1dd449baeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: RevealGame::RevealGame.UI.RouletteConfettiBurst
+  _pieceCount: 72
+  _minimumLifetime: 1.5
+  _maximumLifetime: 2.4
+  _minimumSpeed: 700
+  _maximumSpeed: 1100
+  _gravity: 1350
+  _minimumSize: {x: 10, y: 18}
+  _maximumSize: {x: 18, y: 30}
+  _colours:
+  - {r: 1, g: 0.24, b: 0.32, a: 1}
+  - {r: 1, g: 0.72, b: 0.08, a: 1}
+  - {r: 0.19, g: 0.8, b: 0.52, a: 1}
+  - {r: 0.16, g: 0.62, b: 1, a: 1}
+  - {r: 0.64, g: 0.35, b: 1, a: 1}
+  - {r: 1, g: 0.32, b: 0.72, a: 1}
 --- !u!1 &1000000011
 GameObject:
   m_ObjectHideFlags: 0

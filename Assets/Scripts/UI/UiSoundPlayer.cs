@@ -9,6 +9,7 @@ namespace RevealGame.UI
     public static class UiSoundPlayer
     {
         private const string SettingsResourcePath = "UiSoundSettings";
+        private const float DefaultRouletteSpinDuration = 12.5f;
 
         private static UiSoundSettings _settings;
         private static AudioSource _effectsAudioSource;
@@ -73,16 +74,23 @@ namespace RevealGame.UI
             var source = EnsureGameFlowAudioSource();
             source.clip = correctClip;
             source.loop = false;
+            source.pitch = 1f;
             source.Play();
             EnsureCoroutineHost().StartCoroutine(PlayIntermediateAfterCorrect(transitionVersion, correctClip.length));
         }
 
         /// <summary>
-        /// Starts the non-looping spin track. Calling this again restarts it for the next reward.
+        /// Starts the non-looping spin track and scales it to complete with the reel spin.
         /// </summary>
-        public static void PlaySpin()
+        /// <param name="spinDuration">The duration of the reel spin in seconds.</param>
+        public static void PlaySpin(float spinDuration)
         {
-            PlayOneShotTrack(GetSettings()?.Spin);
+            AudioClip spinClip = GetSettings()?.Spin;
+            float pitch = spinClip != null && spinDuration > 0f
+                ? DefaultRouletteSpinDuration / spinDuration
+                : 1f;
+
+            PlayOneShotTrack(spinClip, pitch);
         }
 
         private static UiSoundSettings GetSettings()
@@ -113,16 +121,18 @@ namespace RevealGame.UI
 
             source.clip = clip;
             source.loop = true;
+            source.pitch = 1f;
             source.Play();
         }
 
-        private static void PlayOneShotTrack(AudioClip clip)
+        private static void PlayOneShotTrack(AudioClip clip, float pitch = 1f)
         {
             BeginGameFlowTransition();
             var source = EnsureGameFlowAudioSource();
             source.Stop();
             source.clip = clip;
             source.loop = false;
+            source.pitch = pitch;
 
             if (clip != null)
                 source.Play();
@@ -146,6 +156,7 @@ namespace RevealGame.UI
             var source = EnsureGameFlowAudioSource();
             source.clip = intermediateClip;
             source.loop = true;
+            source.pitch = 1f;
             source.Play();
         }
 
