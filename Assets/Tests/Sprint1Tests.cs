@@ -515,6 +515,44 @@ namespace RevealGame.Tests
     }
 
     [TestFixture]
+    public class GameSessionHintAssignmentTests
+    {
+        [Test]
+        public void Initialize_AssignsHintsToLootboxes_AndCyclesOnlyAfterUsingEveryHint()
+        {
+            var config = new GameConfig
+            {
+                items = Enumerable.Range(1, 5)
+                    .Select(index => new ItemData { id = $"item_{index}" })
+                    .ToArray(),
+                hints = new[]
+                {
+                    new HintData { id = "hint_1" },
+                    new HintData { id = "hint_2" },
+                    new HintData { id = "hint_3" }
+                },
+                settings = new GameSettings { nLootbox = 5 }
+            };
+            var gameObject = new UnityEngine.GameObject("HintAssignmentTestSession");
+            var session = gameObject.AddComponent<GameSession>();
+
+            session.Initialize(config);
+
+            var assignedHintIds = session.LootboxStates
+                .Select(lootbox => lootbox.currentHintId)
+                .ToList();
+            Assert.AreEqual(5, assignedHintIds.Count);
+            CollectionAssert.AreEquivalent(
+                config.hints.Select(hint => hint.id),
+                assignedHintIds.Take(config.hints.Length));
+            Assert.IsTrue(assignedHintIds.Skip(config.hints.Length)
+                .All(hintId => config.hints.Any(hint => hint.id == hintId)));
+
+            UnityEngine.Object.DestroyImmediate(gameObject);
+        }
+    }
+
+    [TestFixture]
     public class LootboxEngineTests
     {
         private GameConfig CreateTestConfig()

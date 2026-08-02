@@ -68,16 +68,64 @@ namespace RevealGame.Data
             _lootboxStates = new List<LootboxState>();
 
             int numBoxes = config.settings?.nLootbox ?? 1;
-            var itemAssignments = LootboxItemDistributor.Distribute(config, _rng ??= new System.Random());
+            _rng ??= new System.Random();
+            var itemAssignments = LootboxItemDistributor.Distribute(config, _rng);
+            var initialHintIds = BuildInitialHintAssignments(config.hints, numBoxes, _rng);
             for (int i = 0; i < numBoxes; i++)
             {
                 var lootbox = new LootboxState(i);
                 lootbox.AssignItemIds(itemAssignments[i]);
+                lootbox.currentHintId = initialHintIds[i];
                 _lootboxStates.Add(lootbox);
             }
 
             _currentLootboxIndex = -1;
             Debug.Log($"[GameSession] Initialized with {numBoxes} lootboxes, {config.items?.Length ?? 0} items, {config.hints?.Length ?? 0} hints");
+        }
+
+        /// <summary>
+        /// Assigns one hint to every lootbox at the start of the game. Each shuffled
+        /// pass uses every configured hint once before a hint can be reused.
+        /// </summary>
+        private static List<string> BuildInitialHintAssignments(
+            IReadOnlyList<HintData> hints,
+            int lootboxCount,
+            System.Random rng)
+        {
+            var assignments = new List<string>(lootboxCount);
+            if (lootboxCount <= 0)
+                return assignments;
+
+            var hintIds = hints?
+                .Where(hint => hint != null && !string.IsNullOrEmpty(hint.id))
+                .Select(hint => hint.id)
+                .ToList()
+                ?? new List<string>();
+
+            if (hintIds.Count == 0)
+            {
+                assignments.AddRange(Enumerable.Repeat<string>(null, lootboxCount));
+                return assignments;
+            }
+
+            while (assignments.Count < lootboxCount)
+            {
+                var shuffledHintIds = new List<string>(hintIds);
+                Shuffle(shuffledHintIds, rng);
+                int remainingAssignments = lootboxCount - assignments.Count;
+                assignments.AddRange(shuffledHintIds.Take(remainingAssignments));
+            }
+
+            return assignments;
+        }
+
+        private static void Shuffle<T>(IList<T> values, System.Random rng)
+        {
+            for (int index = values.Count - 1; index > 0; index--)
+            {
+                int swapIndex = rng.Next(index + 1);
+                (values[index], values[swapIndex]) = (values[swapIndex], values[index]);
+            }
         }
 
         /// <summary>

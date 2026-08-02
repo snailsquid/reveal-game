@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -117,11 +118,16 @@ namespace RevealGame.UI
                 yield break;
             }
 
+            var previouslyRevealedRewardIds = new HashSet<string>();
             for (int rewardIndex = 0; rewardIndex < rewardItemIds.Count; rewardIndex++)
             {
+                string rewardItemId = rewardItemIds[rewardIndex];
                 bool isLastReward = rewardIndex == rewardItemIds.Count - 1;
-                yield return StartCoroutine(SpinReelForReward(rewardItemIds[rewardIndex]));
-                yield return StartCoroutine(WaitForWinnerConfirmation(rewardItemIds[rewardIndex], isLastReward));
+                yield return StartCoroutine(SpinReelForReward(rewardItemId, previouslyRevealedRewardIds));
+                yield return StartCoroutine(WaitForWinnerConfirmation(rewardItemId, isLastReward));
+
+                if (!string.IsNullOrWhiteSpace(rewardItemId))
+                    previouslyRevealedRewardIds.Add(rewardItemId);
             }
 
             CompleteDisplay();
@@ -160,11 +166,13 @@ namespace RevealGame.UI
                 onComplete?.Invoke();
         }
 
-        private IEnumerator SpinReelForReward(string rewardItemId)
+        private IEnumerator SpinReelForReward(
+            string rewardItemId,
+            HashSet<string> previouslyRevealedRewardIds)
         {
             UiSoundPlayer.PlaySpin();
             ClearReel();
-            BuildReel(rewardItemId);
+            BuildReel(rewardItemId, previouslyRevealedRewardIds);
 
             float targetPosition = _winningItemIndex * _itemSpacing - _winningItemTargetX;
             float startPosition = 0f;
@@ -269,9 +277,14 @@ namespace RevealGame.UI
             return _spinEasing.Evaluate(clampedTime);
         }
 
-        private void BuildReel(string winningItemId)
+        private void BuildReel(string winningItemId, HashSet<string> excludedItemIds)
         {
-            List<Data.ItemData> allItems = GetReelItems();
+            List<Data.ItemData> allItems = GetReelItems()
+                .Where(item => item == null
+                    || string.IsNullOrWhiteSpace(item.id)
+                    || excludedItemIds == null
+                    || !excludedItemIds.Contains(item.id))
+                .ToList();
 
             if (allItems.Count == 0)
                 return;

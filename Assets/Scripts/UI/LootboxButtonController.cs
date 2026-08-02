@@ -43,7 +43,6 @@ namespace RevealGame.UI
             if (_indexLabel != null)
             {
                 _indexLabel.text = labelText;
-                _indexLabel.color = new Color(0.08f, 0.16f, 0.25f);
             }
             if (_button != null) _button.interactable = !isOpened;
 
@@ -105,6 +104,7 @@ namespace RevealGame.UI
 
         private void OnButtonClicked()
         {
+            UiSoundPlayer.PlayButtonClick();
             _onClick?.Invoke(_index);
         }
     }
