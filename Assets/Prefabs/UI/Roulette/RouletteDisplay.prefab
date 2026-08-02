@@ -145,7 +145,10 @@ MonoBehaviour:
   _revealPauseDuration: 0.3
   _rewardDisplayDuration: 1
   _pointerTickAngle: 15
-  _pointerTickForwardDuration: 0.035
+  _pointerSlowFlickSpeed: 250
+  _pointerFastFlickSpeed: 3500
+  _pointerSlowFlickDuration: 0.14
+  _pointerFastFlickDuration: 0.025
   _pointerTickReturnDuration: 0.16
 --- !u!1 &1000000011
 GameObject:

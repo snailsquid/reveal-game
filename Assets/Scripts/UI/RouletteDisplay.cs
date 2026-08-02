@@ -49,8 +49,19 @@ namespace RevealGame.UI
         [Tooltip("Positive values rotate left when the pointer graphic faces upward.")]
         [SerializeField] private float _pointerTickAngle = 15f;
         [Min(0f)]
-        [SerializeField] private float _pointerTickForwardDuration = 0.035f;
+        [Tooltip("Reel speed at or below which the pointer uses its slow flick duration.")]
+        [SerializeField] private float _pointerSlowFlickSpeed = 250f;
         [Min(0f)]
+        [Tooltip("Reel speed at or above which the pointer uses its fast flick duration.")]
+        [SerializeField] private float _pointerFastFlickSpeed = 3500f;
+        [Min(0f)]
+        [Tooltip("Duration of the leftward flick at slow reel speeds.")]
+        [SerializeField] private float _pointerSlowFlickDuration = 0.14f;
+        [Min(0f)]
+        [Tooltip("Duration of the leftward flick at fast reel speeds.")]
+        [SerializeField] private float _pointerFastFlickDuration = 0.025f;
+        [Min(0f)]
+        [Tooltip("Fixed Back-eased return duration after every flick.")]
         [SerializeField] private float _pointerTickReturnDuration = 0.16f;
 
         private GameManager _gameManager;
@@ -384,15 +395,16 @@ namespace RevealGame.UI
             if (_pointer == null || _itemSpacing <= 0f || currentPosition <= previousPosition)
                 return;
 
+            float reelSpeed = (currentPosition - previousPosition) / Mathf.Max(Time.deltaTime, Mathf.Epsilon);
             for (int itemIndex = 0; itemIndex < _reelItems.Count - 1; itemIndex++)
             {
                 float boundaryPosition = ((itemIndex + 0.5f) * _itemSpacing) - _winningItemTargetX;
                 if (previousPosition < boundaryPosition && boundaryPosition <= currentPosition)
-                    StartPointerTick();
+                    StartPointerTick(reelSpeed);
             }
         }
 
-        private void StartPointerTick()
+        private void StartPointerTick(float reelSpeed)
         {
             if (_pointer == null)
                 return;
@@ -400,19 +412,27 @@ namespace RevealGame.UI
             if (_pointerTickCoroutine != null)
                 StopCoroutine(_pointerTickCoroutine);
 
-            _pointerTickCoroutine = StartCoroutine(PointerTickRoutine());
+            _pointerTickCoroutine = StartCoroutine(PointerTickRoutine(GetPointerFlickDuration(reelSpeed)));
         }
 
-        private IEnumerator PointerTickRoutine()
+        private IEnumerator PointerTickRoutine(float flickDuration)
         {
             Quaternion tickRotation = _pointerRestingRotation * Quaternion.Euler(0f, 0f, _pointerTickAngle);
             Quaternion startRotation = _pointer.localRotation;
 
-            yield return RotatePointer(startRotation, tickRotation, _pointerTickForwardDuration, false);
+            yield return RotatePointer(startRotation, tickRotation, flickDuration, false);
             yield return RotatePointer(tickRotation, _pointerRestingRotation, _pointerTickReturnDuration, true);
 
             _pointer.localRotation = _pointerRestingRotation;
             _pointerTickCoroutine = null;
+        }
+
+        private float GetPointerFlickDuration(float reelSpeed)
+        {
+            float slowSpeed = Mathf.Max(0f, _pointerSlowFlickSpeed);
+            float fastSpeed = Mathf.Max(slowSpeed + Mathf.Epsilon, _pointerFastFlickSpeed);
+            float speedProgress = Mathf.InverseLerp(slowSpeed, fastSpeed, reelSpeed);
+            return Mathf.Lerp(_pointerSlowFlickDuration, _pointerFastFlickDuration, speedProgress);
         }
 
         private IEnumerator RotatePointer(Quaternion from, Quaternion to, float duration, bool useBackEasing)
