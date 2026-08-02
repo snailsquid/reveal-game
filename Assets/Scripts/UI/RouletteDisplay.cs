@@ -179,6 +179,15 @@ namespace RevealGame.UI
                 || _winnerConfirmationVideoImage == null)
                 return;
 
+            // The View Video button doubles as a toggle while the confirmation panel is open.
+            // Keep the configured clip so the player can be started again without rebuilding
+            // the winner state.
+            if (_winnerConfirmationVideoImage.gameObject.activeSelf)
+            {
+                HideWinnerVideo();
+                return;
+            }
+
             EnsureWinnerVideoTexture(_winnerConfirmationVideoPlayer.clip);
             _winnerConfirmationImage?.gameObject.SetActive(false);
             _winnerConfirmationVideoImage.gameObject.SetActive(true);
@@ -337,6 +346,17 @@ namespace RevealGame.UI
                 _winnerConfirmationVideoPlayer.Stop();
                 _winnerConfirmationVideoPlayer.clip = null;
             }
+
+            if (_winnerConfirmationVideoImage != null)
+                _winnerConfirmationVideoImage.gameObject.SetActive(false);
+            if (_winnerConfirmationImage != null)
+                _winnerConfirmationImage.gameObject.SetActive(true);
+        }
+
+        private void HideWinnerVideo()
+        {
+            if (_winnerConfirmationVideoPlayer != null)
+                _winnerConfirmationVideoPlayer.Stop();
 
             if (_winnerConfirmationVideoImage != null)
                 _winnerConfirmationVideoImage.gameObject.SetActive(false);

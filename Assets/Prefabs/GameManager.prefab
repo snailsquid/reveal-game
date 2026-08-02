@@ -50,6 +50,7 @@ MonoBehaviour:
   _hintGameScreen: {fileID: 0}
   _mediaDisplay: {fileID: 0}
   _botStatusImage: {fileID: 0}
+  _botStatusText: {fileID: 0}
   _discordServerUrl: http://localhost:3000
   _discordServerApiKey: dev-insecure-key
   _discordHealthCheckInterval: 2
@@ -70,10 +71,40 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3980cecd7e4d928e59d93264eec9e772, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RevealGame::RevealGame.UI.GameInitializer
-  _configSO: {fileID: 11400000, guid: 12bacfced0f50a1778441a258ad3902f, type: 2}
+  _configSO: {fileID: 11400000, guid: 2064976b5292b350d8e07b4e20335ee7, type: 2}
   _testConfig:
     items: []
     hints: []
     settings:
       nLootbox: 0
+      correctAnswerFormat: '{user} guessed the correct answer:
+
+        ''{answer}'''
+      defaultHintTitleFormat: Solve the puzzle!
+      openLootboxButtonLabelFormat: Open Lootbox
+      backToLootboxesButtonLabelFormat: Back to Lootboxes
+      backButtonLabelFormat: Back
+      lootboxOpenFailedFormat: The lootbox could not be opened.
+      lootboxOpenedNoPrizesFormat: 'Lootbox opened
+
+
+        No prizes this time.'
+      lootboxOpenedWithPrizesFormat: 'Lootbox opened
+
+
+        You unlocked {count}
+        item(s):
+
+        {items}'
+      rewardSpinningFormat: 'Reward {index} of {count}
+
+        Spinning...'
+      rewardRevealedFormat: 'Reward {index} of {count}
+
+        {title}'
+      lootboxLabelFormat: Box {index}
+      openedNoPrizeFormat: 'Opened
+
+        No prize'
+      discordUnavailableFormat: Discord server unavailable.
   _gameManager: {fileID: 8537174245286221306}
