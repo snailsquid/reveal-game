@@ -1,5 +1,6 @@
 ﻿<Solution>
   <Project Path="RevealGame.csproj" />
-  <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="RevealGame.Tests.csproj" />
+  <Project Path="RevealGame.EditorTests.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>

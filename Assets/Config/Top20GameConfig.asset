@@ -43,331 +43,306 @@ MonoBehaviour:
     No prize'
   _discordUnavailableFormat: Discord server unavailable.
   _items:
-  - title: Paper Plane Shooter
-    teamName: Prabudiworks
-    image: {fileID: 9216077489812350708, guid: b046eda614d2b150392a4d17fd19b9a6, type: 3}
+  - title: 'Paper Plane Shooter'
+    teamName: 'Prabudiworks'
+    image: {fileID: -2020041399011861972, guid: a3cee7488a0e8328a816f1d3a43f8421, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Slam it Slam!
-    teamName: Gimdeka
-    image: {fileID: 504725473004760966, guid: 44f9ff4b9ac88fdb9a06061de79941c7, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: FIH
-    teamName: BPGA
-    image: {fileID: -7253982535374551188, guid: 93f33fe610b3cfaf7ac11723e1d5d26e, type: 3}
+  - title: 'Slam it Slam!'
+    teamName: 'Gimdeka'
+    image: {fileID: -5434469684214682774, guid: b9a72f80a3ec395818c92910c76ecb25, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Bedtime Escape!
-    teamName: Sobo no Inori
-    image: {fileID: -5995102353604613041, guid: 564746e3616e8cf3e9943bc005c8ef8c, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Hooman! Pls do it for me!
-    teamName: Kicaw Mania
-    image: {fileID: -2387868845679331273, guid: 35ee92a113b7946e3acd53b20582e547, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Tabletop Battles
-    teamName: Shift Malam
-    image: {fileID: 4622624814945685674, guid: 200e1e88af253f59a8b261780d1a85b9, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Sky Clash
-    teamName: Gaterbas
-    image: {fileID: 5662129362792512443, guid: a10189874b28e7935bcd02125c69a299, type: 3}
+  - title: 'FIH'
+    teamName: 'BPGA'
+    image: {fileID: 4603326986716411277, guid: 67e6512ef1b39b3f38406b01d2f67ddc, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Fable Rumble
-    teamName: Kekaisaran Rempah
-    image: {fileID: -5715256795421648649, guid: 0da5254080cdf29cfb1f6b02423d87dd, type: 3}
+  - title: 'Bedtime Escape!'
+    teamName: 'Sobo no Inori'
+    image: {fileID: 7358482490474374632, guid: e226ddda1daddb189a03f582ba968769, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Spell Type
-    teamName: Sleep Pioneers
-    image: {fileID: -7615010227296466531, guid: dd6c5f8b21de32fbc89f1a3888e58f77, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Wizard Doodie
-    teamName: DecayRecay
-    image: {fileID: 3879303877215116204, guid: c788f3637e7b292f7a5cadd483ca6a49, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Kevin
-    teamName: s life
-    image: {fileID: 64976433056825459, guid: b3fabbda973c517a0bf8b8031823d44c, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Chord Memories
-    teamName: Roukie x iUS
-    image: {fileID: 3387922814661797863, guid: 70c295431e37dbd4795380f91609f074, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Sukebat
-    teamName: Kretacat Express
-    image: {fileID: -2980205397005598124, guid: 395bbcab05bff4c1381d532cc7dd289f, type: 3}
+  - title: 'Hooman! Pls do it for me!'
+    teamName: 'Kicaw Mania'
+    image: {fileID: 1717101740882568439, guid: 1a4ace98c96109da9a0f4df40e5641fe, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: I Am_
-    teamName: SukaCuan
-    image: {fileID: -3286208464654389563, guid: a767c498a284ec8e5ae4caa94d66d4f9, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Little Mayor
-    teamName: A FAIR Studio
-    image: {fileID: -5694123995276085001, guid: 1ec28557875bd4fe29318671d2ca7e3e, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Funk Guy
-    teamName: First Line Games
-    image: {fileID: -1845292425874850366, guid: 770143412a4e39613b3bf040c5adc4ac, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Otolago
-    teamName: Palicin
-    image: {fileID: -6516161462978316263, guid: 544a60229636f81539b52f63e2de9286, type: 3}
+  - title: 'Tabletop Battles'
+    teamName: 'Shift Malam'
+    image: {fileID: -8389398957828808050, guid: 016550d9973ffe63289db456a488a599, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Waking Up
-    teamName: Vinco Studio Code
-    image: {fileID: 678638122152457832, guid: 243c9bb769a4da903afbff889525fc01, type: 3}
+  - title: 'Sky Clash'
+    teamName: 'Gaterbas'
+    image: {fileID: -6686241004003005830, guid: 3974dd85ea2602c2c88a81270b8a1e39, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Blanket Fort
-    teamName: Tiki Tiki
-    image: {fileID: 8192346031795808746, guid: 5e05888c015eae333a3565915cc75b1f, type: 3}
+  - title: 'Fable Rumble'
+    teamName: 'Kekaisaran Rempah'
+    image: {fileID: 8946185820494398929, guid: 842f3f3b0e222d2bfb3a8a6fadbe2308, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Dream Memories
-    teamName: Feline Sigma
-    image: {fileID: 1688565755407773441, guid: 8cfd8c65aa0694eb482abe34e9002262, type: 3}
+  - title: 'Spell Type'
+    teamName: 'Sleep Pioneers'
+    image: {fileID: 2508689332208128927, guid: 901e606bf71534725817a404e3230c46, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Stationary Warfare
-    teamName: Lumiere
-    image: {fileID: -7407219563403966266, guid: 318d4fab95ae5c045bfbc11653d92636, type: 3}
+  - title: 'Wizard Doodie'
+    teamName: 'DecayRecay'
+    image: {fileID: 5945350723444632251, guid: ae24d16727733a3d7a5d936767b8b6e4, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Kevin_s life'
+    teamName: 'Light house'
+    image: {fileID: 6908865083299893751, guid: feca58c76e963a69e87b939488741495, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Chord Memories'
+    teamName: 'Roukie x iUS'
+    image: {fileID: -8005907997991613677, guid: 2186109c61d88f2dc9779174586f322f, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Cowsmic Revenge
-    teamName: Smolestial
-    image: {fileID: 7273812610624173082, guid: ce8c56bc78009a941986e004555e3abd, type: 3}
+  - title: 'Sukebat'
+    teamName: 'Kretacat Express'
+    image: {fileID: 2428829950490374657, guid: b2150a0341af6262b98cb0aa14491774, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: K-T3ktive
-    teamName: COGSTRA
-    image: {fileID: -4173932949786846289, guid: d866a27adeb180724938e7a14d41c887, type: 3}
+  - title: 'I Am_'
+    teamName: 'SukaCuan'
+    image: {fileID: -6430049587336495126, guid: e216bcd924b6152dc9f30737d48cd217, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Little Mayor'
+    teamName: 'A FAIR Studio'
+    image: {fileID: -5166005990842065036, guid: 7551927bb837b7ee78d350c1a61f5730, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Airel.exe
-    teamName: Relheim Games
-    image: {fileID: 8591411932192696173, guid: a340411931dcc5cf1ac3360a0119d610, type: 3}
+  - title: 'Funk Guy'
+    teamName: 'First Line Games'
+    image: {fileID: 3434262062837518385, guid: 6f98acd5ffd9c6f1bbe2fb608cea9777, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Nearsight
-    teamName: Socotri
-    image: {fileID: -1587625242417706409, guid: 70d021af7305f666f9ffa63bfd99063e, type: 3}
+  - title: 'Otolago'
+    teamName: 'Palicin'
+    image: {fileID: -5999357539163774674, guid: 4057d4694f2578cf9a2d9c0eae1e4d9e, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Waking Up'
+    teamName: 'Vinco Studio Code'
+    image: {fileID: -531522408041007713, guid: 2e9f5a44437d8d347a28c8c4d483686a, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Blanket Fort'
+    teamName: 'Tiki Tiki'
+    image: {fileID: -8768116432857667854, guid: 5d05e63e8ddb2d636859f78ad64e1e69, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Daydream at 8
-    teamName: Tim Gila
-    image: {fileID: -231584738777349658, guid: 1f4c15ac776f5dd1ab9e789fa4b7cac0, type: 3}
+  - title: 'Dream Memories'
+    teamName: 'Feline Sigma'
+    image: {fileID: -8976412308979884722, guid: 46718b35e9c096ce8aafa7d746098697, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Stationary Warfare'
+    teamName: 'Lumiere'
+    image: {fileID: -2769580060665504769, guid: 39d95570ab77f5b27a65df63a70f89f4, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Just Five Minute, Mom!
-    teamName: Feline Alpha
-    image: {fileID: -4259963771260211768, guid: aabc392ec81823340abf0a9d2e3ebaf1, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Where Kites Fly
-    teamName: Sit & Lay Studio
-    image: {fileID: 5766986963764096915, guid: 625b913682660f4bda0f55a667ab1aa2, type: 3}
+  - title: 'K-T3ktive'
+    teamName: 'COGSTRA'
+    image: {fileID: 7833108078804794531, guid: e87e9ff2c5fb61dde975b936d1b51b06, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Orion
-    teamName: ' Whiskers of Seasons'
-    image: {fileID: 8663339699474257649, guid: 18a8fb4881d7943b487285673715d015, type: 3}
+  - title: 'Airel.exe'
+    teamName: 'Relheim Games'
+    image: {fileID: -9208435416753724618, guid: ae1b5073823a90301820a7b829e6592d, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Llama and Lizard
-    teamName: Beware!
-    image: {fileID: -6312216300790412454, guid: f5e425accf50bedefb70a4d687ebab43, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Liminal Parking
-    teamName: Warkop777
-    image: {fileID: 5863795865801076459, guid: 59cfbe102b00cc975a5f3264b5048d36, type: 3}
+  - title: 'Nearsight'
+    teamName: 'Socotri'
+    image: {fileID: -7122851543725594132, guid: 6f56360515aca765c96a6ccce9f7c642, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Catfish
-    teamName: Bon-19
-    image: {fileID: 4519536067286823761, guid: e97d955d16231835fad39215334e53d8, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Me be goin
-    teamName: ' To Work'
-    image: {fileID: -7166431861149165082, guid: 6eed6d93f0a4cede1918535d28fbddc7, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Tactura
-    teamName: Incommodious
-    image: {fileID: 7471294065891764380, guid: 8306477d0e23227e0920a6bfeaa41475, type: 3}
+  - title: 'Just Five Minute, Mom!'
+    teamName: 'Feline Alpha'
+    image: {fileID: 917009596395052028, guid: 3e3cf4a78a490eae4bf2c7e8cc97d598, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Vacuum Protocol
-    teamName: =+N
-    image: {fileID: -267956624732666070, guid: 1869a6b487cc21cfc85eabb6c6af0407, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: AMOK
-    teamName: Doomscrolling Studio
-    image: {fileID: 736791824970822866, guid: 81c961ca958087f7e80ed4051610d382, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Craftboard Heroes
-    teamName: OnTable
-    image: {fileID: 5359876119156574782, guid: b667007082f0f8a19a7af65566cbf101, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Insectropy
-    teamName: NoBrainDev
-    image: {fileID: 1754593959598649708, guid: 5cc533b5a82066c6db2def1ce08e427e, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Dice on Delivery
-    teamName: Terserah
-    image: {fileID: 9098901335161773263, guid: 1055ef8a866a4102f96bdb4e2b0071bd, type: 3}
+  - title: 'Where Kites Fly'
+    teamName: 'Sit & Lay Studio'
+    image: {fileID: 1027313734788353518, guid: fd3e90d820362a36d83eecc01486f3e6, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Rusted Machine
-    teamName: Owl Picture
-    image: {fileID: 9008450410917890501, guid: 711e8073e1e927dffa3893c0986c0f21, type: 3}
+  - title: 'Orion_ Whiskers of Seasons'
+    teamName: 'Sorein Play'
+    image: {fileID: -7589304916630584506, guid: 2496aecaea5b02cdca3fd87ac7af5623, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Llama and Lizard'
+    teamName: 'Beware!'
+    image: {fileID: -3504041698778799738, guid: f6a79cbe2ae2cc22fb7735a676425ba3, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Mecha Cafe
-    teamName: ' Dreamy'
-    image: {fileID: -428327523930027108, guid: cfcdc804aca045f90acef792fe621358, type: 3}
+  - title: 'Liminal Parking'
+    teamName: 'Warkop777'
+    image: {fileID: 3710322452325436445, guid: 74ea09287f0aee3169361cc141aa9240, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: SKIP IT!
-    teamName: Sego Kucing
-    image: {fileID: 7000966061913922324, guid: 9816c73a67d214c92bacf8a421b95864, type: 3}
+  - title: 'Catfish'
+    teamName: 'Bon-19'
+    image: {fileID: -4163620025634307110, guid: a698a73f865496d0a9483e49a52e3825, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Pandora
-    teamName: s Snake
-    image: {fileID: 1262787151163429234, guid: 790193d9491a04410be4fc45cf161e0c, type: 3}
+  - title: 'Me be goin_ To Work'
+    teamName: 'Next Step GDC'
+    image: {fileID: 7566186350794141858, guid: 85e2e4a2e09852a9cbea95ede90d0f23, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Rags of Racs
-    teamName: Dhelangan Studio
-    image: {fileID: 508507856054793884, guid: 66edf595bc2ca94749050839362bb310, type: 3}
+  - title: 'Tactura'
+    teamName: 'Incommodious'
+    image: {fileID: -6457344538593881780, guid: d4f4b28bf9d3b2ac08e90d4c65e06fbf, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Suiko
-    teamName: Intermezzo
-    image: {fileID: 1438878195969276600, guid: 663ab4aeaaa256af6ac474e88d60d723, type: 3}
+  - title: 'Vacuum Protocol'
+    teamName: '=+N'
+    image: {fileID: 5596107824721237635, guid: 6282f7cab6ad99f8cb72d9c3e4776eb2, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: ConeFlict
-    teamName: Onimochi
-    image: {fileID: 5441953902605661859, guid: 611002cb897ef446eaf885fedcffa5d0, type: 3}
+  - title: 'AMOK'
+    teamName: 'Doomscrolling Studio'
+    image: {fileID: 2248349712757225694, guid: 646ba86e0968e9de39ad588bad600d7d, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Clash on Delivery
-    teamName: Arcanist
-    image: {fileID: 7303571975942704211, guid: 1c76ec1b74526aaa28ae8a18d29c6db5, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Booger Bureaucracy
-    teamName: andri hendri
-    image: {fileID: 3156346824144771731, guid: 7e4841c8d4098c8d696e4cb4571413a0, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: My Little War
-    teamName: Nemara
-    image: {fileID: 2039141884957554003, guid: 7bc2f91b644978d4ea6acbbdb7212a07, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Stationery Defender TD Tycoon
-    teamName: Kusuma Games
-    image: {fileID: 7443367597031344092, guid: 2afde13b389131f8a9a61c4b237bba86, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Wartegeon
-    teamName: ' Chaos'
-    image: {fileID: -7631000887877151821, guid: eb7f18da2c31f780292393a93367e700, type: 3}
+  - title: 'Insectropy'
+    teamName: 'NoBrainDev'
+    image: {fileID: -1409277288834140270, guid: 718724c2406a5f57fa267b371a2bdce5, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Scrolling It!
-    teamName: JamBread
-    image: {fileID: -8739664424189753468, guid: 98c9cc8d11657613a8110333667ed65a, type: 3}
+  - title: 'Dice on Delivery'
+    teamName: 'Terserah'
+    image: {fileID: 6580821124486576251, guid: 440eb66879d17f3068e329f5848dc878, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: SLAP IT!
-    teamName: Fun Goose Devs
-    image: {fileID: -1894394043013101007, guid: 69f09f91665052219aefe21adfb62bb6, type: 3}
+  - title: 'Rusted Machine'
+    teamName: 'Owl Picture'
+    image: {fileID: -6750876086264180096, guid: 260d5177cd07c247493419aced6318be, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Mister Bigchainsaw Goblin (MBG)
-    teamName: 5ampm
-    image: {fileID: 5969047656789784941, guid: 2ac56eabda072d088ab09d65dcf6ccea, type: 3}
+  - title: 'Mecha Cafe_ Dreamy'
+    teamName: 'Kelir Gameworks'
+    image: {fileID: 7039409007637896048, guid: 676cd6a30373b2c31943ea777243dfa6, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Otok-Otok Survivor
-    teamName: Manangkan Games
-    image: {fileID: -7420149998093645051, guid: af53746278e73053481bf1bada110666, type: 3}
+  - title: 'SKIP IT!'
+    teamName: 'Sego Kucing'
+    image: {fileID: 7269723585168877373, guid: 87117fe3123300b5caa880d5661d7ded, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Lunaian Blind Date
-    teamName: Lunaian
-    image: {fileID: 2892820908009441069, guid: e7017997d8eae4751b2af81041634076, type: 3}
+  - title: 'Pandora_s Snake'
+    teamName: 'Slafurry Studios'
+    image: {fileID: -1413155233225943904, guid: b85b1e6e26044d9db8aba8ee5165ad1c, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: Masbook
-    teamName: ' Doom Scrolling'
-    image: {fileID: 7878935241482928153, guid: a6ec1d6abf629c489b48d28fe39bfdeb, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Finger Beat
-    teamName: Kepiting Kelapa Gading
-    image: {fileID: -6800619527090517315, guid: a41ca53ff43610a80991a61f6dd5905e, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: Fira
-    teamName: s Pursuit
-    image: {fileID: -1024275110482057762, guid: 7f0b4cb0135845427810056402abae03, type: 3}
-    video: {fileID: 0}
-    isWinner: 0
-  - title: STICK CLUB
-    teamName: Two Gav
-    image: {fileID: -2636278354492672983, guid: 2c7f78e1e248a7e9f96f4e8595c7abd3, type: 3}
+  - title: 'Rags of Racs'
+    teamName: 'Dhelangan Studio'
+    image: {fileID: -335702794312545423, guid: ea8e71505cbf09434946db32e9ae125e, type: 3}
     video: {fileID: 0}
     isWinner: 1
-  - title: Rain Riot
-    teamName: Vyrio
-    image: {fileID: -1632469064287477724, guid: 0fe195147d05b289cbc4afff0f23d396, type: 3}
-    video: {fileID: 0}
-    isWinner: 1
-  - title: Pebblebound
-    teamName: Piknik Kecil
-    image: {fileID: -3454520554755478596, guid: 9bf0a10e58655722b9563cf01ec79ef8, type: 3}
-    video: {fileID: 0}
-    isWinner: 1
-  - title: My Company
-    teamName: Techereo
-    image: {fileID: -6375873545553781957, guid: 4f6c9a829b590ab5d9c63f3e4dab269d, type: 3}
+  - title: 'Suiko'
+    teamName: 'Intermezzo'
+    image: {fileID: -3336404970665682062, guid: 60b0d93ef2da95bffbc058678cbcb2c8, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: StyroFlight
-    teamName: IdeaOut
-    image: {fileID: -2993473058882042034, guid: 493f82ec30880bbbdb60d2d9c11c379a, type: 3}
+  - title: 'ConeFlict'
+    teamName: 'Onimochi'
+    image: {fileID: 1301086321200591959, guid: 5320930e52e7f864aa13190fb566cd30, type: 3}
     video: {fileID: 0}
     isWinner: 0
-  - title: My Uncle
-    teamName: s A Parking Freak
-    image: {fileID: 3035908770983752421, guid: ca59b0e8cfbe3425bbc1f2779ab3fe57, type: 3}
+  - title: 'Clash on Delivery'
+    teamName: 'Arcanist'
+    image: {fileID: -7028459562711751591, guid: fb4ecdb27b9cf961fa4b8ff65f9e6ff8, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Booger Bureaucracy'
+    teamName: 'andri hendri'
+    image: {fileID: 4943262060713378748, guid: 73ec7de9e4ea6e5c0b6469aa101faa8e, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'My Little War'
+    teamName: 'Nemara'
+    image: {fileID: -4321051295397416370, guid: e788669781dc1a69ebdfe1fb85019569, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Stationery Defender TD Tycoon'
+    teamName: 'Kusuma Games'
+    image: {fileID: -5632218904364724941, guid: 4d3e854ef1bea92e8a229a0ad09c4011, type: 3}
     video: {fileID: 0}
     isWinner: 1
+  - title: 'Wartegeon_ Chaos'
+    teamName: 'Yolo Team'
+    image: {fileID: 7263098710396341440, guid: 3e08faefc9a132978bf4c364ae9dc5ca, type: 3}
+    video: {fileID: 0}
+    isWinner: 1
+  - title: 'Scrolling It!'
+    teamName: 'JamBread'
+    image: {fileID: -1399725258071841025, guid: e03e23c8634528de7b107174e5ee85fe, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'SLAP IT!'
+    teamName: 'Fun Goose Devs'
+    image: {fileID: -783646507866176099, guid: 82a4964f77395bb0f853454f54f165cd, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Mister Bigchainsaw Goblin (MBG)'
+    teamName: '5ampm'
+    image: {fileID: -7104287256085876123, guid: de630d26bef3955c28294f09eeb143cf, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Otok-Otok Survivor'
+    teamName: 'Manangkan Games'
+    image: {fileID: 8609324447408856213, guid: bdd30bf11affa13128f1e472eab99fb7, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Lunaian Blind Date'
+    teamName: 'Lunaian'
+    image: {fileID: 7835920739027611302, guid: fef2935ee132a1120b89df67a695e61c, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Masbook_ Doom Scrolling'
+    teamName: 'Summerland'
+    image: {fileID: 8074266601925042545, guid: ff0540de29c96fd148db6578d4100443, type: 3}
+    video: {fileID: 0}
+    isWinner: 1
+  - title: 'Finger Beat'
+    teamName: 'Kepiting Kelapa Gading'
+    image: {fileID: -3448015653057172646, guid: 21ee49b88f223cf998ce499abd6a99b9, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Fira_s Pursuit'
+    teamName: 'SeedAcademy'
+    image: {fileID: 17396612601975414, guid: fa3c84c20e88c815d9064a4cadb1e3bb, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'STICK CLUB_Two Gav'
+    teamName: ' New Horizons'
+    image: {fileID: -130532566751691005, guid: 9a2e101d1ebbff4ebab8cb30d80a7184, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Rain Riot'
+    teamName: 'Vyrio'
+    image: {fileID: 5791997554421449268, guid: c73cb03e7ad2059c59930ae7c5e6ea83, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'Pebblebound'
+    teamName: 'Piknik Kecil'
+    image: {fileID: 4367954908173449054, guid: 61a53058402667dcea48762b070c0f9f, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
+  - title: 'My Company'
+    teamName: 'Techereo'
+    image: {fileID: -1054231745018549600, guid: 3ad408e8ec767459c8011ba63fb33223, type: 3}
+    video: {fileID: 0}
+    isWinner: 0
   _hints:
   - title: Game Apa Ini?
     hintType: 0
