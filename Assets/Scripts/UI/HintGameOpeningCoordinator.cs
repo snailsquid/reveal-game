@@ -104,6 +104,7 @@ namespace RevealGame.UI
             if (_isHandlingStep || step == null || step == _lastHandledStep)
                 return;
 
+            var previousStep = _lastHandledStep;
             _lastHandledStep = step;
             _isHandlingStep = true;
             try
@@ -116,7 +117,11 @@ namespace RevealGame.UI
 
                 if (step.TryGetComponent<ItemPreviewView>(out var previewView))
                 {
-                    UiSoundPlayer.PlayDefaultMusic();
+                    // A correct answer begins a sting that transitions into the intermediate
+                    // loop. Starting the default loop here would cancel that transition.
+                    if (previousStep == null || !previousStep.TryGetComponent<AnswerPopupView>(out _))
+                        UiSoundPlayer.PlayDefaultMusic();
+
                     ShowItemPreview(previewView);
                 }
                 else if (step.TryGetComponent<HintGameView>(out var hintView))
