@@ -19,6 +19,7 @@ namespace RevealGame.UI
             var sprite = mediaDisplay?.ResolveItemSprite(item);
             _itemImage.sprite = sprite;
             _itemImage.enabled = sprite != null;
+            ItemImageAlignmentUtility.Apply(_itemImage, item);
             _titleText.text = string.IsNullOrEmpty(item.title) ? item.id : item.title;
             _descriptionText.text = item.description ?? string.Empty;
         }

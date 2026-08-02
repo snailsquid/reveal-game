@@ -5,6 +5,7 @@ using NUnit.Framework;
 using RevealGame.Data;
 using RevealGame.Gameplay;
 using RevealGame.Importing;
+using RevealGame.UI;
 
 namespace RevealGame.Tests
 {
@@ -191,6 +192,7 @@ namespace RevealGame.Tests
             items.arraySize = 2;
             items.GetArrayElementAtIndex(0).FindPropertyRelative("title").stringValue = "First Item";
             items.GetArrayElementAtIndex(0).FindPropertyRelative("teamName").stringValue = "First Team";
+            items.GetArrayElementAtIndex(0).FindPropertyRelative("imageAlignment").enumValueIndex = (int)ItemImageAlignment.Right;
             items.GetArrayElementAtIndex(1).FindPropertyRelative("title").stringValue = "Second Item";
 
             var hints = serialized.FindProperty("_hints");
@@ -233,9 +235,34 @@ namespace RevealGame.Tests
             Assert.AreEqual("item_0", config.items[0].id);
             Assert.AreEqual("item_1", config.items[1].id);
             Assert.AreEqual("First Team", config.items[0].teamName);
+            Assert.AreEqual(ItemImageAlignment.Right, config.items[0].imageAlignment);
+            Assert.AreEqual(ItemImageAlignment.Center, config.items[1].imageAlignment);
             Assert.AreEqual(1, config.hints.Length);
             Assert.AreEqual("hint_0", config.hints[0].id);
             UnityEngine.Object.DestroyImmediate(so);
+        }
+
+        [TestCase(ItemImageAlignment.Left, 0f)]
+        [TestCase(ItemImageAlignment.Center, 0.5f)]
+        [TestCase(ItemImageAlignment.Right, 1f)]
+        public void ItemImageAlignmentUtility_ApplyPositionsImageAtConfiguredAlignment(
+            ItemImageAlignment alignment,
+            float expectedAnchor)
+        {
+            var gameObject = new UnityEngine.GameObject(
+                "Item Image",
+                typeof(UnityEngine.RectTransform));
+            var image = gameObject.AddComponent<UnityEngine.UI.Image>();
+            var imageRect = image.rectTransform;
+            imageRect.sizeDelta = new UnityEngine.Vector2(200f, 100f);
+
+            ItemImageAlignmentUtility.Apply(image, new ItemData { imageAlignment = alignment });
+
+            Assert.AreEqual(expectedAnchor, imageRect.anchorMin.x);
+            Assert.AreEqual(expectedAnchor, imageRect.anchorMax.x);
+            Assert.AreEqual(expectedAnchor, imageRect.pivot.x);
+            Assert.AreEqual(0f, imageRect.anchoredPosition.x);
+            UnityEngine.Object.DestroyImmediate(gameObject);
         }
     }
 

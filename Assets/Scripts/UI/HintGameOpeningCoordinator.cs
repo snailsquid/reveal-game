@@ -17,7 +17,8 @@ namespace RevealGame.UI
         [SerializeField] private HintGameUIController _navigation;
         [SerializeField] private HintGameView _hintView;
 
-        private string _pendingAnswerMessage;
+        private string _pendingGuesser;
+        private string _pendingAnswer;
         private Coroutine _revealRoutine;
         private Coroutine _initialStepSyncRoutine;
         private bool _hintIsActive;
@@ -169,7 +170,7 @@ namespace RevealGame.UI
         private void ShowCorrectAnswerPopup(AnswerPopupView answerPopupView)
         {
             answerPopupView.Setup(_gameManager);
-            answerPopupView.Show(_pendingAnswerMessage ?? string.Empty, 3f);
+            answerPopupView.Show(_pendingGuesser ?? string.Empty, _pendingAnswer ?? string.Empty, 3f);
         }
 
         private void StartReveal(RouletteDisplay rouletteDisplay)
@@ -206,7 +207,8 @@ namespace RevealGame.UI
 
             _hintIsActive = false;
             _gameManager.DiscordAnswerListener?.StopListening();
-            _pendingAnswerMessage = _gameManager.Session.Config.settings.FormatCorrectAnswer(username, answer);
+            _pendingGuesser = username;
+            _pendingAnswer = answer;
             _hintView?.GetComponent<HintGameNavigationStep>()?.RequestNext();
         }
 

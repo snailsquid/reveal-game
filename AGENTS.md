@@ -15,41 +15,9 @@ Use TextTMP instead of plain Text component for texts
 Lootbox: The item being opened to gacha
 Item: The reward of the gacha from lootbox
 
-# YAML driven
-
-This game is driven by a single .zip file containing a yaml file and other supporting files
-yaml file contains the following
-
-1. A list of items (required)
-   An item includes:
-
-- video/image path (optional, default: broken.png)
-- title (required)
-- description (required)
-- isWinner (optional, default: false)
-
-2. Settings
-
-- nLootbox (required)
-
-3. List of hints
-   A hint includes:
-
-- title (optional)
-- hintType (required, "image")
-- answer (required)
-- isCaseSensitive (optional, default: false)
-  if hintType=="image"
-- list of video/image paths
-
-# Mechanic
-
-1. Insertion
-   User inserts a zip file containing all the items and information for the game.
-   The yaml will be validated first (including the image paths) before continuing to the next step
-2. Game creation
-   The game for the specified yaml will be generated.
-3. Game play
+1. Game creation
+   The game for the specified config will be generated.
+2. Game play
    a. Title screen Play (Title screen -> Lootboxes Screen)
    b. Pick a lootbox (Lootboxes Screen -> Lootbox Open Screen)
    c. Player is given a randomized (new) hint game

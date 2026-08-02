@@ -49,6 +49,7 @@ namespace RevealGame.Data
             public Sprite image;
             public VideoClip video;
             public bool isWinner;
+            public ItemImageAlignment imageAlignment = ItemImageAlignment.Center;
         }
 
         [Serializable]

@@ -4,6 +4,13 @@ using UnityEngine.Video;
 
 namespace RevealGame.Data
 {
+    public enum ItemImageAlignment
+    {
+        Center,
+        Left,
+        Right
+    }
+
     [Serializable]
     public class ItemData
     {
@@ -13,6 +20,7 @@ namespace RevealGame.Data
         public string description;
         public string mediaPath;
         public bool isWinner;
+        public ItemImageAlignment imageAlignment = ItemImageAlignment.Center;
 
         [NonSerialized] public Sprite sprite;
         [NonSerialized] public VideoClip videoClip;

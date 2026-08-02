@@ -26,7 +26,7 @@ namespace RevealGame.UI
     public interface IAnswerPopupView
     {
         void Setup(GameManager gameManager);
-        void Show(string messageText, float displayDuration = 3f);
+        void Show(string player, string answer, float displayDuration = 3f);
         void Hide();
         bool IsVisible { get; }
         event Action Dismissed;

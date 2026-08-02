@@ -221,6 +221,7 @@ namespace RevealGame.UI
             {
                 _winnerConfirmationImage.sprite = ResolveItemSprite(reward);
                 _winnerConfirmationImage.enabled = _winnerConfirmationImage.sprite != null;
+                ItemImageAlignmentUtility.Apply(_winnerConfirmationImage, reward);
             }
             if (_winnerConfirmationNextLabel != null)
                 _winnerConfirmationNextLabel.text = isLastReward ? "Back to Lootboxes" : "Next Winner";
@@ -360,6 +361,7 @@ namespace RevealGame.UI
             {
                 itemImage.sprite = item != null ? ResolveItemSprite(item) : null;
                 itemImage.enabled = itemImage.sprite != null;
+                ItemImageAlignmentUtility.Apply(itemImage, item);
             }
 
             if (gameText != null)
@@ -408,6 +410,8 @@ namespace RevealGame.UI
         {
             if (_pointer == null)
                 return;
+
+            UiSoundPlayer.PlayRouletteTick();
 
             if (_pointerTickCoroutine != null)
                 StopCoroutine(_pointerTickCoroutine);

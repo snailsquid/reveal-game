@@ -49,6 +49,7 @@ namespace RevealGame.Importing
                 title = entry.title,
                 teamName = entry.teamName,
                 isWinner = entry.isWinner,
+                imageAlignment = entry.imageAlignment,
                 sprite = entry.image,
                 videoClip = entry.video
             };

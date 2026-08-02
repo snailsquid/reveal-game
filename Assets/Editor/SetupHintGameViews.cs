@@ -26,7 +26,8 @@ namespace RevealGame.Editor
             }
             
             var resultPopup = hintGameScreen.transform.Find("ResultPopup");
-            var resultText = hintGameScreen.transform.Find("ResultPopup/ResultText");
+            var playerText = hintGameScreen.transform.Find("ResultPopup/Player");
+            var answerText = hintGameScreen.transform.Find("ResultPopup/Answer");
             var continueButton = hintGameScreen.transform.Find("ResultPopup/ContinueButton");
             
             var hintGameUIController = hintGameScreen.GetComponent<HintGameUIController>();
@@ -127,10 +128,10 @@ namespace RevealGame.Editor
                 answerPopup = resultPopup.gameObject.AddComponent<AnswerPopupView>();
                 answerPopup.SetFieldValue("_popupRoot", resultPopup.gameObject);
                 
-                if (resultText != null)
-                {
-                    answerPopup.SetFieldValue("_resultText", resultText.GetComponent<Text>());
-                }
+                if (playerText != null)
+                    answerPopup.SetFieldValue("_playerText", playerText.GetComponent<Text>());
+                if (answerText != null)
+                    answerPopup.SetFieldValue("_answerText", answerText.GetComponent<Text>());
                 
                 if (continueButton != null)
                 {

@@ -86,6 +86,8 @@ namespace RevealGame.UI
                 if (image != null && winner?.sprite != null)
                     image.sprite = winner.sprite;
 
+                ItemImageAlignmentUtility.Apply(image, winner);
+
                 _winnerInstances.Add(winnerInstance);
             }
         }

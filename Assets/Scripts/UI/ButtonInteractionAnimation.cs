@@ -48,6 +48,7 @@ namespace RevealGame.UI
         {
             _button = GetComponent<Button>();
             _restScale = transform.localScale;
+            _button.onClick.AddListener(UiSoundPlayer.PlayButtonClick);
         }
 
         private void OnDisable()
@@ -59,6 +60,9 @@ namespace RevealGame.UI
 
         private void OnDestroy()
         {
+            if (_button != null)
+                _button.onClick.RemoveListener(UiSoundPlayer.PlayButtonClick);
+
             KillScaleTween();
         }
 
@@ -67,7 +71,10 @@ namespace RevealGame.UI
             _isPointerOver = true;
 
             if (CanAnimate())
+            {
+                UiSoundPlayer.PlayButtonHover();
                 AnimateTo(_restScale * _hoverScaleMultiplier, _hoverDuration, _hoverEase);
+            }
         }
 
         public void OnPointerExit(PointerEventData eventData)

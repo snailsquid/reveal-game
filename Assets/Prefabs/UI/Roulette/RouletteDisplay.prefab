@@ -670,7 +670,6 @@ GameObject:
   - component: {fileID: 9000000043}
   - component: {fileID: 9000000044}
   - component: {fileID: 476939204860216909}
-  - component: {fileID: 145919880097215326}
   - component: {fileID: 5429833458195966360}
   m_Layer: 0
   m_Name: ImageContainer
@@ -751,21 +750,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.AspectRatioFitter
   m_AspectMode: 1
   m_AspectRatio: 1.777
---- !u!114 &145919880097215326
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9000000041}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6143470fba8a428ebf939b045b43ec00, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: RevealGame::RevealGame.UI.ImageAspectRatioFitter
-  _image: {fileID: 7632429187053644692}
-  _rawImage: {fileID: 0}
-  _aspectRatioFitter: {fileID: 476939204860216909}
 --- !u!114 &5429833458195966360
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -927,6 +911,7 @@ GameObject:
   - component: {fileID: 8706537170339296532}
   - component: {fileID: 8440562012034240966}
   - component: {fileID: 7632429187053644692}
+  - component: {fileID: 9000000046}
   m_Layer: 0
   m_Name: WinnerImage
   m_TagString: Untagged
@@ -948,10 +933,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 9000000042}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_SizeDelta: {x: 960, y: 540}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8440562012034240966
 CanvasRenderer:
@@ -991,6 +976,20 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &9000000046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3269794335063508168}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6143470fba8a428ebf939b045b43ec00, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: RevealGame::RevealGame.UI.ImageAspectRatioFitter
+  _image: {fileID: 7632429187053644692}
+  _rawImage: {fileID: 0}
 --- !u!1 &4459979932649713924
 GameObject:
   m_ObjectHideFlags: 0

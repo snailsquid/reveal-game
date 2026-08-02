@@ -9,7 +9,8 @@ namespace RevealGame.UI
     {
         [Header("UI References")]
         [SerializeField] private GameObject _popupRoot;
-        [SerializeField] private Text _resultText;
+        [SerializeField] private Text _playerText;
+        [SerializeField] private Text _answerText;
         [SerializeField] private Button _continueButton;
 
         [Header("Animation")]
@@ -46,7 +47,8 @@ namespace RevealGame.UI
         private void AutoDiscoverUIReferences()
         {
             if (_popupRoot == null) _popupRoot = gameObject;
-            if (_resultText == null) _resultText = GetComponentInChildren<Text>(true);
+            if (_playerText == null) _playerText = FindUIComponent<Text>("Player");
+            if (_answerText == null) _answerText = FindUIComponent<Text>("Answer");
             if (_continueButton == null)
                 _continueButton = FindUIComponent<Button>("ContinueButton", "Continue");
         }
@@ -79,12 +81,14 @@ namespace RevealGame.UI
             _gameManager = gameManager;
         }
 
-        public void Show(string messageText, float displayDuration = -1f)
+        public void Show(string player, string answer, float displayDuration = -1f)
         {
             if (_popupRoot == null) return;
 
-            if (_resultText != null)
-                _resultText.text = messageText;
+            if (_playerText != null)
+                _playerText.text = player ?? string.Empty;
+            if (_answerText != null)
+                _answerText.text = answer ?? string.Empty;
 
             _transition ??= UiTransition.GetOrAdd(_popupRoot);
             _transition.Show();
