@@ -104,6 +104,7 @@ namespace RevealGame.UI
             EnsureScreenNavigator();
             _discordStatusCoordinator?.StopListening();
             _screenNavigator.ShowTitleScreen();
+            UiSoundPlayer.PlayDefaultMusic();
         }
 
         /// <summary>
@@ -114,6 +115,7 @@ namespace RevealGame.UI
             EnsureScreenNavigator();
             _discordStatusCoordinator?.StopListening();
             _screenNavigator.ShowLootboxScreen();
+            UiSoundPlayer.PlayDefaultMusic();
 
             var controller = _screenNavigator.LootboxScreen?.GetComponent<LootboxScreenController>();
             if (controller != null)
@@ -127,6 +129,7 @@ namespace RevealGame.UI
         {
             EnsureScreenNavigator();
             _screenNavigator.ShowHintGameScreen();
+            UiSoundPlayer.PlayDefaultMusic();
         }
 
         public IReadOnlyList<string> OpenLootboxForReveal()

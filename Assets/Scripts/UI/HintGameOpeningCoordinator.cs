@@ -114,9 +114,15 @@ namespace RevealGame.UI
                 }
 
                 if (step.TryGetComponent<ItemPreviewView>(out var previewView))
+                {
+                    UiSoundPlayer.PlayDefaultMusic();
                     ShowItemPreview(previewView);
+                }
                 else if (step.TryGetComponent<HintGameView>(out var hintView))
+                {
+                    UiSoundPlayer.PlayGuessingMusic();
                     BeginHintGame(hintView);
+                }
                 else if (step.TryGetComponent<AnswerPopupView>(out var answerPopupView))
                     ShowCorrectAnswerPopup(answerPopupView);
                 else if (step.TryGetComponent<RouletteDisplay>(out var rouletteDisplay))
@@ -209,6 +215,7 @@ namespace RevealGame.UI
             _gameManager.DiscordAnswerListener?.StopListening();
             _pendingGuesser = username;
             _pendingAnswer = answer;
+            UiSoundPlayer.PlayGuessCorrectThenIntermediate();
             _hintView?.GetComponent<HintGameNavigationStep>()?.RequestNext();
         }
 

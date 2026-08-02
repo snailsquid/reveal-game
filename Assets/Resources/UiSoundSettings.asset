@@ -15,3 +15,8 @@ MonoBehaviour:
   _buttonHover: {fileID: 8300000, guid: 351938055f488a3f1aa526e702ce84d1, type: 3}
   _buttonClick: {fileID: 8300000, guid: eaebea3fd9cb68fe98b47485a45b6f32, type: 3}
   _rouletteTick: {fileID: 8300000, guid: 8dd5f984314df75579314d7149d927b6, type: 3}
+  _defaultMusic: {fileID: 8300000, guid: 6c5f99ff342729fd283b24b51e0a8e0a, type: 3}
+  _guessingMusic: {fileID: 8300000, guid: 7136d0d9b134d9858962560662bc88fe, type: 3}
+  _guessCorrect: {fileID: 8300000, guid: ff64fe09bce33acdebe553291bb0f377, type: 3}
+  _intermediateMusic: {fileID: 8300000, guid: b181b6916b50c5ba3a3a042e6b5983b4, type: 3}
+  _spin: {fileID: 8300000, guid: a07f2da035238e146b8d656afac7c492, type: 3}

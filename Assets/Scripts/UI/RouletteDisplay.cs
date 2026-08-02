@@ -162,6 +162,7 @@ namespace RevealGame.UI
 
         private IEnumerator SpinReelForReward(string rewardItemId)
         {
+            UiSoundPlayer.PlaySpin();
             ClearReel();
             BuildReel(rewardItemId);
 
