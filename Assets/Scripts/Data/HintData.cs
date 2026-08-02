@@ -21,6 +21,7 @@ namespace RevealGame.Data
         public bool isCaseSensitive;
         public string[] mediaPaths;
 
+        [NonSerialized] public Sprite answerImage;
         [NonSerialized] public Sprite[] sprites;
 
         public bool HasDirectMedia => sprites != null && sprites.Length > 0;

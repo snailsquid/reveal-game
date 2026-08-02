@@ -442,7 +442,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 1}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.9607843}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1610,7 +1610,7 @@ RectTransform:
   m_AnchorMin: {x: 0.08, y: 0.18}
   m_AnchorMax: {x: 0.92, y: 0.82}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 0}
+  m_SizeDelta: {x: 100, y: -101.759995}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &819908266
 MonoBehaviour:
@@ -2012,7 +2012,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 39e5764437c21df1585387bb2771f36d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: RevealGame::RevealGame.UI.ScrollingStripBackground
-  _speed: 90
+  _speed: 20
 --- !u!114 &1098858390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2122,8 +2122,8 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 145707030}
   - {fileID: 1098858386}
+  - {fileID: 145707030}
   - {fileID: 1381400138}
   - {fileID: 113150949}
   - {fileID: 555293938}
@@ -2180,7 +2180,7 @@ RectTransform:
   m_AnchorMin: {x: 0.08, y: 0.18}
   m_AnchorMax: {x: 0.92, y: 0.82}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 0}
+  m_SizeDelta: {x: 100, y: 16}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1593800697
 MonoBehaviour:

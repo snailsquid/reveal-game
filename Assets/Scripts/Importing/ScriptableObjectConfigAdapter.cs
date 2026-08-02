@@ -63,6 +63,9 @@ namespace RevealGame.Importing
                 title = entry.title,
                 hintType = entry.hintType,
                 answer = entry.answer,
+                answerImage = entry.answerImage != null
+                    ? entry.answerImage
+                    : entry.images?.LastOrDefault(),
                 isCaseSensitive = entry.isCaseSensitive,
                 sprites = entry.images
             };

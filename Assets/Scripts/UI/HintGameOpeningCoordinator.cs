@@ -19,6 +19,7 @@ namespace RevealGame.UI
 
         private string _pendingGuesser;
         private string _pendingAnswer;
+        private Sprite _pendingAnswerImage;
         private Coroutine _revealRoutine;
         private Coroutine _initialStepSyncRoutine;
         private bool _hintIsActive;
@@ -176,7 +177,11 @@ namespace RevealGame.UI
         private void ShowCorrectAnswerPopup(AnswerPopupView answerPopupView)
         {
             answerPopupView.Setup(_gameManager);
-            answerPopupView.Show(_pendingGuesser ?? string.Empty, _pendingAnswer ?? string.Empty, 3f);
+            answerPopupView.Show(
+                _pendingGuesser ?? string.Empty,
+                _pendingAnswer ?? string.Empty,
+                _pendingAnswerImage,
+                3f);
         }
 
         private void StartReveal(RouletteDisplay rouletteDisplay)
@@ -215,6 +220,7 @@ namespace RevealGame.UI
             _gameManager.DiscordAnswerListener?.StopListening();
             _pendingGuesser = username;
             _pendingAnswer = answer;
+            _pendingAnswerImage = result.Hint?.answerImage;
             UiSoundPlayer.PlayGuessCorrectThenIntermediate();
             _hintView?.GetComponent<HintGameNavigationStep>()?.RequestNext();
         }

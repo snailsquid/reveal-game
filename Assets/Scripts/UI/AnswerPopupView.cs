@@ -11,6 +11,7 @@ namespace RevealGame.UI
         [SerializeField] private GameObject _popupRoot;
         [SerializeField] private Text _playerText;
         [SerializeField] private Text _answerText;
+        [SerializeField] private Image _answerImage;
         [SerializeField] private Button _continueButton;
 
         [Header("Animation")]
@@ -49,6 +50,7 @@ namespace RevealGame.UI
             if (_popupRoot == null) _popupRoot = gameObject;
             if (_playerText == null) _playerText = FindUIComponent<Text>("Player");
             if (_answerText == null) _answerText = FindUIComponent<Text>("Answer");
+            if (_answerImage == null) _answerImage = FindUIComponent<Image>("AnswerImage");
             if (_continueButton == null)
                 _continueButton = FindUIComponent<Button>("ContinueButton", "Continue");
         }
@@ -81,7 +83,7 @@ namespace RevealGame.UI
             _gameManager = gameManager;
         }
 
-        public void Show(string player, string answer, float displayDuration = -1f)
+        public void Show(string player, string answer, Sprite answerImage, float displayDuration = -1f)
         {
             if (_popupRoot == null) return;
 
@@ -89,6 +91,12 @@ namespace RevealGame.UI
                 _playerText.text = player ?? string.Empty;
             if (_answerText != null)
                 _answerText.text = answer ?? string.Empty;
+            if (_answerImage != null)
+            {
+                _answerImage.sprite = answerImage;
+                _answerImage.preserveAspect = true;
+                _answerImage.gameObject.SetActive(answerImage != null);
+            }
 
             _transition ??= UiTransition.GetOrAdd(_popupRoot);
             _transition.Show();

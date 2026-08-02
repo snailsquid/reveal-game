@@ -58,6 +58,7 @@ namespace RevealGame.Data
             public string title;
             public HintType hintType = HintType.Image;
             public string answer;
+            public Sprite answerImage;
             public bool isCaseSensitive;
             public Sprite[] images = Array.Empty<Sprite>();
         }

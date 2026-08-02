@@ -5,6 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 namespace RevealGame.UI
 {
@@ -26,6 +27,10 @@ namespace RevealGame.UI
         [SerializeField] private TMP_Text _winnerConfirmationDeveloperText;
         [SerializeField] private Image _winnerConfirmationImage;
         [SerializeField] private TMP_Text _winnerConfirmationNextLabel;
+        [Tooltip("Shown only when the winning item has a video clip. Plays the clip in the winner image area.")]
+        [SerializeField] private Button _winnerConfirmationVideoButton;
+        [SerializeField] private RawImage _winnerConfirmationVideoImage;
+        [SerializeField] private VideoPlayer _winnerConfirmationVideoPlayer;
 
         [Header("Reel Settings")]
         [SerializeField] private int _totalItemsOnReel = 40;
@@ -76,6 +81,7 @@ namespace RevealGame.UI
         private RouletteConfettiBurst _confettiBurst;
         private Coroutine _pointerTickCoroutine;
         private Quaternion _pointerRestingRotation;
+        private RenderTexture _winnerVideoTexture;
 
         private void Awake()
         {
@@ -83,6 +89,8 @@ namespace RevealGame.UI
             _rouletteTransition = UiTransition.GetOrAdd(_rouletteRoot);
             _winnerConfirmationTransition = UiTransition.GetOrAdd(_winnerConfirmationScreen);
             _winnerConfirmationTransition?.SetVisibleImmediately(false);
+            if (_winnerConfirmationVideoButton != null)
+                _winnerConfirmationVideoButton.onClick.AddListener(ShowWinnerVideo);
             _confettiBurst = GetComponent<RouletteConfettiBurst>();
             CachePointerRestingRotation();
         }
@@ -90,6 +98,15 @@ namespace RevealGame.UI
         private void OnDisable()
         {
             ResetPointerTick();
+            StopWinnerVideo();
+        }
+
+        private void OnDestroy()
+        {
+            if (_winnerConfirmationVideoButton != null)
+                _winnerConfirmationVideoButton.onClick.RemoveListener(ShowWinnerVideo);
+
+            ReleaseWinnerVideoTexture();
         }
 
         public void Setup(GameManager gameManager)
@@ -148,7 +165,24 @@ namespace RevealGame.UI
         /// </summary>
         public void ContinueAfterWinner()
         {
+            StopWinnerVideo();
             _winnerConfirmationAdvanceRequested = true;
+        }
+
+        /// <summary>
+        /// Called by the winner confirmation's View Video button.
+        /// </summary>
+        public void ShowWinnerVideo()
+        {
+            if (_winnerConfirmationVideoPlayer == null
+                || _winnerConfirmationVideoPlayer.clip == null
+                || _winnerConfirmationVideoImage == null)
+                return;
+
+            EnsureWinnerVideoTexture(_winnerConfirmationVideoPlayer.clip);
+            _winnerConfirmationImage?.gameObject.SetActive(false);
+            _winnerConfirmationVideoImage.gameObject.SetActive(true);
+            _winnerConfirmationVideoPlayer.Play();
         }
 
         public void Dispose()
@@ -226,6 +260,7 @@ namespace RevealGame.UI
 
             Data.ItemData reward = GetItemById(rewardItemId);
             string rewardTitle = reward != null ? reward.title : rewardItemId;
+            ConfigureWinnerVideo(reward);
             if (_winnerConfirmationGameText != null)
                 _winnerConfirmationGameText.text = rewardTitle ?? string.Empty;
             if (_winnerConfirmationDeveloperText != null)
@@ -249,6 +284,7 @@ namespace RevealGame.UI
 
         private IEnumerator HideWinnerConfirmation()
         {
+            StopWinnerVideo();
             if (_winnerConfirmationTransition == null || !_winnerConfirmationScreen.activeSelf)
             {
                 _winnerConfirmationAdvanceRequested = false;
@@ -264,10 +300,85 @@ namespace RevealGame.UI
 
         private void HideWinnerConfirmationImmediately()
         {
+            StopWinnerVideo();
             _winnerConfirmationTransition ??= UiTransition.GetOrAdd(_winnerConfirmationScreen);
             _winnerConfirmationTransition?.SetVisibleImmediately(false);
 
             _winnerConfirmationAdvanceRequested = false;
+        }
+
+        private void ConfigureWinnerVideo(Data.ItemData reward)
+        {
+            StopWinnerVideo();
+
+            VideoClip videoClip = reward?.videoClip;
+            bool hasVideo = videoClip != null
+                && _winnerConfirmationVideoButton != null
+                && _winnerConfirmationVideoImage != null
+                && _winnerConfirmationVideoPlayer != null;
+
+            if (_winnerConfirmationVideoButton != null)
+                _winnerConfirmationVideoButton.gameObject.SetActive(hasVideo);
+            if (_winnerConfirmationVideoImage != null)
+                _winnerConfirmationVideoImage.gameObject.SetActive(false);
+
+            if (!hasVideo)
+                return;
+
+            _winnerConfirmationVideoPlayer.clip = videoClip;
+            _winnerConfirmationVideoPlayer.isLooping = true;
+            EnsureWinnerVideoTexture(videoClip);
+        }
+
+        private void StopWinnerVideo()
+        {
+            if (_winnerConfirmationVideoPlayer != null)
+            {
+                _winnerConfirmationVideoPlayer.Stop();
+                _winnerConfirmationVideoPlayer.clip = null;
+            }
+
+            if (_winnerConfirmationVideoImage != null)
+                _winnerConfirmationVideoImage.gameObject.SetActive(false);
+            if (_winnerConfirmationImage != null)
+                _winnerConfirmationImage.gameObject.SetActive(true);
+        }
+
+        private void EnsureWinnerVideoTexture(VideoClip videoClip)
+        {
+            if (_winnerConfirmationVideoPlayer == null || _winnerConfirmationVideoImage == null || videoClip == null)
+                return;
+
+            int width = (int)Mathf.Max(1, videoClip.width);
+            int height = (int)Mathf.Max(1, videoClip.height);
+            if (_winnerVideoTexture == null || _winnerVideoTexture.width != width || _winnerVideoTexture.height != height)
+            {
+                ReleaseWinnerVideoTexture();
+                _winnerVideoTexture = new RenderTexture(width, height, 0, RenderTextureFormat.ARGB32)
+                {
+                    name = "WinnerVideoTexture"
+                };
+                _winnerVideoTexture.Create();
+            }
+
+            _winnerConfirmationVideoPlayer.renderMode = VideoRenderMode.RenderTexture;
+            _winnerConfirmationVideoPlayer.targetTexture = _winnerVideoTexture;
+            _winnerConfirmationVideoImage.texture = _winnerVideoTexture;
+        }
+
+        private void ReleaseWinnerVideoTexture()
+        {
+            if (_winnerConfirmationVideoPlayer != null)
+                _winnerConfirmationVideoPlayer.targetTexture = null;
+            if (_winnerConfirmationVideoImage != null)
+                _winnerConfirmationVideoImage.texture = null;
+
+            if (_winnerVideoTexture == null)
+                return;
+
+            _winnerVideoTexture.Release();
+            Destroy(_winnerVideoTexture);
+            _winnerVideoTexture = null;
         }
 
         private float EvaluateSpinProgress(float normalizedTime)
