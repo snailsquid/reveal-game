@@ -9,6 +9,7 @@ namespace RevealGame.UI
     public static class UiSoundPlayer
     {
         private const string SettingsResourcePath = "UiSoundSettings";
+        private const string MusicMutedPreferenceKey = "RevealGame.MusicMuted";
         private const float DefaultRouletteSpinDuration = 12.5f;
 
         private static UiSoundSettings _settings;
@@ -16,6 +17,21 @@ namespace RevealGame.UI
         private static AudioSource _gameFlowAudioSource;
         private static MonoBehaviour _coroutineHost;
         private static int _gameFlowTransitionVersion;
+        private static bool? _musicMuted;
+
+        /// <summary>
+        /// Gets whether game-flow music is currently muted.
+        /// </summary>
+        public static bool IsMusicMuted
+        {
+            get
+            {
+                if (!_musicMuted.HasValue)
+                    _musicMuted = PlayerPrefs.GetInt(MusicMutedPreferenceKey, 0) != 0;
+
+                return _musicMuted.Value;
+            }
+        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
@@ -25,6 +41,28 @@ namespace RevealGame.UI
             _gameFlowAudioSource = null;
             _coroutineHost = null;
             _gameFlowTransitionVersion = 0;
+            _musicMuted = null;
+        }
+
+        /// <summary>
+        /// Sets the mute state for background and game-flow music and persists it locally.
+        /// UI sound effects remain available while music is muted.
+        /// </summary>
+        public static void SetMusicMuted(bool muted)
+        {
+            _musicMuted = muted;
+            PlayerPrefs.SetInt(MusicMutedPreferenceKey, muted ? 1 : 0);
+            PlayerPrefs.Save();
+            ApplyMusicMuteState();
+        }
+
+        /// <summary>
+        /// Toggles the background music mute state and returns the new state.
+        /// </summary>
+        public static bool ToggleMusicMuted()
+        {
+            SetMusicMuted(!IsMusicMuted);
+            return IsMusicMuted;
         }
 
         public static void PlayButtonHover()
@@ -185,7 +223,14 @@ namespace RevealGame.UI
             var audioObject = EnsureAudioObject();
             _gameFlowAudioSource = audioObject.AddComponent<AudioSource>();
             Configure2DAudioSource(_gameFlowAudioSource);
+            ApplyMusicMuteState();
             return _gameFlowAudioSource;
+        }
+
+        private static void ApplyMusicMuteState()
+        {
+            if (_gameFlowAudioSource != null)
+                _gameFlowAudioSource.mute = IsMusicMuted;
         }
 
         private static MonoBehaviour EnsureCoroutineHost()

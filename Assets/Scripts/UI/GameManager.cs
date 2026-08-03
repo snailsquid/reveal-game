@@ -45,6 +45,7 @@ namespace RevealGame.UI
         private void Awake()
         {
             ButtonInteractionAnimationInstaller.EnsureInstalled();
+            MusicToggleButton.EnsureInstalled();
             _gameSessionCoordinator = new GameSessionCoordinator();
             _gameSessionCoordinator.InitializeSession(GameSession.Instance);
 
