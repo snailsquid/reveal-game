@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.IO.Compression;
 using UnityEditor;
@@ -23,7 +22,7 @@ namespace RevealGame.Editor
             }
 
             string destinationDirectory = Path.Combine(Application.streamingAssetsPath, "discord-listener");
-            string zipPath = Path.Combine(destinationDirectory, "node_modules.zip");
+            string zipPath = Path.Combine(destinationDirectory, "node_modules.bytes");
 
             if (Directory.Exists(destinationDirectory))
             {
@@ -33,33 +32,27 @@ namespace RevealGame.Editor
             Directory.CreateDirectory(destinationDirectory);
             CopyDirectory(sourceDirectory, destinationDirectory);
 
-            if (Directory.Exists(Path.Combine(destinationDirectory, "node_modules")))
-            {
-                Directory.Delete(Path.Combine(destinationDirectory, "node_modules"), true);
-            }
-
-            if (File.Exists(zipPath))
-            {
-                File.Delete(zipPath);
-            }
-
             string sourceNodeModules = Path.Combine(sourceDirectory, "node_modules");
-            if (Directory.Exists(sourceNodeModules))
+            if (!Directory.Exists(sourceNodeModules))
             {
-                ZipFile.CreateFromDirectory(sourceNodeModules, zipPath);
+                throw new BuildFailedException("discord-listener/node_modules was not found. Run 'npm install' in discord-listener before building.");
             }
-            else
-            {
-                Debug.LogWarning("discord-listener/node_modules not found. Run 'npm install' in discord-listener before building.");
-            }
+
+            CopyDirectory(sourceNodeModules, Path.Combine(destinationDirectory, "modules"));
+            ZipFile.CreateFromDirectory(sourceNodeModules, zipPath);
+            Debug.Log($"[DiscordListenerBuildPreprocessor] Packaged listener modules: directory={Directory.Exists(Path.Combine(destinationDirectory, "modules"))}, archive={File.Exists(zipPath)}");
+
+            if (!File.Exists(Path.Combine(sourceDirectory, ".env")))
+                Debug.LogWarning("discord-listener/.env was not found. The built game will start the listener, but Discord credentials must be supplied through the process environment.");
         }
 
         private static void CopyDirectory(string sourceDir, string destinationDir)
         {
+            Directory.CreateDirectory(destinationDir);
             foreach (string file in Directory.GetFiles(sourceDir))
             {
                 string fileName = Path.GetFileName(file);
-                if (fileName == ".env" || fileName == ".gitignore")
+                if (fileName == ".gitignore")
                     continue;
                 File.Copy(file, Path.Combine(destinationDir, fileName));
             }

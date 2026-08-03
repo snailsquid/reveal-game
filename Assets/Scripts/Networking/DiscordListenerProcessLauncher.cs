@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using UnityEngine;
 
 namespace RevealGame.UI
@@ -45,7 +46,7 @@ namespace RevealGame.UI
                 return;
             }
 
-            string listenerDirectory = ResolveListenerDirectory();
+            string listenerDirectory = PrepareListenerDirectory(ResolveListenerDirectory());
             if (!Directory.Exists(listenerDirectory))
             {
                 UnityEngine.Debug.LogWarning($"[DiscordListenerProcessLauncher] Listener directory was not found: {listenerDirectory}");
@@ -166,7 +167,7 @@ namespace RevealGame.UI
             }
 
 #if UNITY_EDITOR
-            string editorDirectory = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..", "discord-listener"));
+            string editorDirectory = Path.GetFullPath(Path.Combine(Application.dataPath, "..", "discord-listener"));
             if (Directory.Exists(editorDirectory))
                 return editorDirectory;
 #endif
@@ -190,6 +191,58 @@ namespace RevealGame.UI
             string bundledNodeName = Application.platform == RuntimePlatform.WindowsPlayer ? "node.exe" : "node";
             string bundledNode = Path.Combine(listenerDirectory, "runtime", bundledNodeName);
             return File.Exists(bundledNode) ? bundledNode : _nodeExecutable;
+        }
+
+        private string PrepareListenerDirectory(string listenerDirectory)
+        {
+            string bundledModulesArchive = Path.Combine(listenerDirectory, "node_modules.bytes");
+            if (!File.Exists(bundledModulesArchive))
+                bundledModulesArchive = Path.Combine(listenerDirectory, "node_modules.zip");
+            string bundledModulesDirectory = Path.Combine(listenerDirectory, "modules");
+            if (Directory.Exists(Path.Combine(listenerDirectory, "node_modules"))
+                || (!File.Exists(bundledModulesArchive) && !Directory.Exists(bundledModulesDirectory)))
+                return listenerDirectory;
+
+            string extractedDirectory = Path.Combine(Application.persistentDataPath, "discord-listener");
+            string extractedModules = Path.Combine(extractedDirectory, "node_modules");
+            if (!Directory.Exists(extractedModules))
+            {
+                if (Directory.Exists(extractedDirectory))
+                    Directory.Delete(extractedDirectory, true);
+
+                Directory.CreateDirectory(extractedDirectory);
+                CopyDirectory(listenerDirectory, extractedDirectory);
+                if (Directory.Exists(bundledModulesDirectory))
+                {
+                    CopyDirectory(bundledModulesDirectory, extractedModules);
+                }
+                else
+                {
+                    Directory.CreateDirectory(extractedModules);
+                    ZipFile.ExtractToDirectory(bundledModulesArchive, extractedModules);
+                }
+            }
+
+            return extractedDirectory;
+        }
+
+        private static void CopyDirectory(string sourceDirectory, string destinationDirectory)
+        {
+            Directory.CreateDirectory(destinationDirectory);
+            foreach (string file in Directory.GetFiles(sourceDirectory))
+            {
+                string fileName = Path.GetFileName(file);
+                if (string.Equals(fileName, "node_modules.bytes", StringComparison.OrdinalIgnoreCase)
+                    || string.Equals(fileName, "node_modules.zip", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                File.Copy(file, Path.Combine(destinationDirectory, fileName), true);
+            }
+
+            foreach (string directory in Directory.GetDirectories(sourceDirectory))
+            {
+                CopyDirectory(directory, Path.Combine(destinationDirectory, Path.GetFileName(directory)));
+            }
         }
 
         private static bool IsLocalUrl(string serverUrl)

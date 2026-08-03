@@ -1,43 +1,30 @@
 import { Client, GatewayIntentBits } from "discord.js";
 import { createServer } from "node:http";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
+import { randomUUID } from "node:crypto";
 
 const DISCORD_BOT_TOKEN = process.env.DISCORD_BOT_TOKEN ?? "";
-const DISCORD_CHANNEL_ID = process.env.DISCORD_CHANNEL_ID ?? "";
-const DISCORD_GUILD_ID = process.env.DISCORD_GUILD_ID ?? "";
-const API_PORT = parseInt(process.env.API_PORT ?? "3100", 10);
+const GAME_API_KEY = process.env.GAME_API_KEY ?? "";
+const API_PORT = parseInt(process.env.API_PORT ?? "3000", 10);
+
+const configuredChannelIds = (process.env.DISCORD_ALLOWED_CHANNEL_IDS
+  ?? process.env.DISCORD_ALLOWED_CHANNEL_ID
+  ?? process.env.DISCORD_CHANNEL_ID
+  ?? "")
+  .split(",")
+  .map((id) => id.trim())
+  .filter(Boolean);
 
 if (!DISCORD_BOT_TOKEN) {
-  console.error("DISCORD_BOT_TOKEN is required. Copy it from https://discord.com/developers/applications > your app > Bot > Reset Token.");
-  process.exit(1);
-}
-if (!DISCORD_GUILD_ID) {
-  console.error("DISCORD_GUILD_ID is required. Right-click your server name in Discord > Copy Server ID (enable Developer Mode in Settings > Advanced).");
-  process.exit(1);
-}
-if (!DISCORD_CHANNEL_ID) {
-  console.error("DISCORD_CHANNEL_ID is required. Right-click the target channel in Discord > Copy Channel ID (enable Developer Mode in Settings > Advanced).");
+  console.error("DISCORD_BOT_TOKEN is required. Set it in discord-listener/.env.");
   process.exit(1);
 }
 
-const STATE_FILE = join(__dirname, "..", "state.json");
-
-function loadState() {
-  if (!existsSync(STATE_FILE)) return { status: "idle" };
-  try {
-    return JSON.parse(readFileSync(STATE_FILE, "utf8"));
-  } catch {
-    return { status: "idle" };
-  }
+if (!configuredChannelIds.length) {
+  console.error("At least one Discord channel ID is required in DISCORD_ALLOWED_CHANNEL_IDS.");
+  process.exit(1);
 }
 
-function saveState(state) {
-  writeFileSync(STATE_FILE, JSON.stringify(state, null, 2));
-}
+const sessions = new Map();
 
 const client = new Client({
   intents: [
@@ -47,58 +34,160 @@ const client = new Client({
   ],
 });
 
+function isChannelVisible() {
+  return configuredChannelIds.some((channelId) => client.channels.cache.has(channelId));
+}
+
+function sendJson(response, statusCode, value) {
+  response.writeHead(statusCode, {
+    "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+  });
+  response.end(JSON.stringify(value));
+}
+
+function isAuthorized(request) {
+  return Boolean(GAME_API_KEY) && request.headers["x-game-api-key"] === GAME_API_KEY;
+}
+
+function readJson(request) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    request.setEncoding("utf8");
+    request.on("data", (chunk) => {
+      body += chunk;
+      if (body.length > 64 * 1024) {
+        reject(new Error("Request body is too large."));
+        request.destroy();
+      }
+    });
+    request.on("end", () => {
+      try {
+        resolve(body ? JSON.parse(body) : {});
+      } catch {
+        reject(new Error("Request body must be valid JSON."));
+      }
+    });
+    request.on("error", reject);
+  });
+}
+
+function serializeSession(session) {
+  return {
+    sessionId: session.sessionId,
+    status: session.status,
+    matchedBy: session.matchedBy ?? null,
+  };
+}
+
 client.once("clientReady", () => {
   console.log(`Logged in as ${client.user.tag}`);
-
-  const guild = client.guilds.cache.get(DISCORD_GUILD_ID);
-  if (!guild) {
-    console.error(`Guild ${DISCORD_GUILD_ID} not found. Make sure the bot is invited to this server.`);
-    process.exit(1);
+  const visible = configuredChannelIds.filter((id) => client.channels.cache.has(id));
+  if (!visible.length) {
+    console.error("The bot cannot see any configured Discord channel. Check the channel IDs and permissions.");
+  } else {
+    console.log(`Watching ${visible.length} configured Discord channel(s).`);
   }
-
-  const channel = guild.channels.cache.get(DISCORD_CHANNEL_ID);
-  if (!channel) {
-    console.error(`Channel ${DISCORD_CHANNEL_ID} not found in guild ${DISCORD_GUILD_ID}. Make sure the bot has access to this channel.`);
-    process.exit(1);
-  }
-
-  console.log(`Watching channel: #${channel.name}`);
 });
 
 client.on("messageCreate", (message) => {
-  if (message.author.bot) return;
-  if (message.channelId !== DISCORD_CHANNEL_ID) return;
+  if (message.author.bot || !configuredChannelIds.includes(message.channelId)) return;
 
-  const content = message.content.trim();
-  if (!content) return;
+  const guess = message.content.trim();
+  if (!guess) return;
 
-  console.log(`[${new Date().toISOString()}] ${message.author.username}: ${content}`);
-  saveState({ status: "answered", answer: content, timestamp: Date.now() });
+  for (const session of sessions.values()) {
+    if (session.status !== "listening") continue;
+
+    const expected = session.answer.trim();
+    const matches = session.isCaseSensitive
+      ? guess === expected
+      : guess.localeCompare(expected, undefined, { sensitivity: "accent" }) === 0;
+    if (!matches) continue;
+
+    session.status = "matched";
+    session.matchedBy = { username: message.author.username, guess };
+    console.log(`[${new Date().toISOString()}] ${message.author.username} matched session ${session.sessionId}.`);
+    break;
+  }
 });
 
-client.login(DISCORD_BOT_TOKEN);
+const server = createServer(async (request, response) => {
+  response.setHeader("Access-Control-Allow-Origin", "*");
+  response.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type, X-Game-Api-Key");
 
-const server = createServer((req, res) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-  if (req.method === "OPTIONS") {
-    res.writeHead(204);
-    res.end();
+  if (request.method === "OPTIONS") {
+    response.writeHead(204);
+    response.end();
     return;
   }
 
-  if (req.url === "/state") {
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify(loadState()));
+  if (!isAuthorized(request)) {
+    sendJson(response, 401, { error: "Unauthorized" });
     return;
   }
 
-  res.writeHead(404);
-  res.end("Not found");
+  if (request.method === "GET" && request.url === "/health") {
+    sendJson(response, 200, {
+      api: "ready",
+      discord: {
+        connected: client.isReady(),
+        channelVisible: client.isReady() && isChannelVisible(),
+      },
+    });
+    return;
+  }
+
+  if (request.method === "POST" && request.url === "/sessions") {
+    try {
+      const body = await readJson(request);
+      if (typeof body.answer !== "string" || !body.answer.trim()) {
+        sendJson(response, 400, { error: "answer is required" });
+        return;
+      }
+
+      const session = {
+        sessionId: randomUUID(),
+        answer: body.answer,
+        isCaseSensitive: Boolean(body.isCaseSensitive),
+        hintId: typeof body.hintId === "string" ? body.hintId : "",
+        status: "listening",
+        matchedBy: null,
+      };
+      sessions.set(session.sessionId, session);
+      sendJson(response, 201, serializeSession(session));
+    } catch (error) {
+      sendJson(response, 400, { error: error.message });
+    }
+    return;
+  }
+
+  const sessionMatch = request.url?.match(/^\/sessions\/([^/?]+)$/);
+  if (sessionMatch) {
+    const session = sessions.get(sessionMatch[1]);
+    if (!session) {
+      sendJson(response, 404, { error: "Session not found" });
+      return;
+    }
+
+    if (request.method === "GET") {
+      sendJson(response, 200, serializeSession(session));
+      return;
+    }
+
+    if (request.method === "DELETE") {
+      sessions.delete(session.sessionId);
+      sendJson(response, 200, { status: "cancelled" });
+      return;
+    }
+  }
+
+  sendJson(response, 404, { error: "Not found" });
 });
 
 server.listen(API_PORT, () => {
   console.log(`API listening on http://localhost:${API_PORT}`);
 });
+
+client.login(DISCORD_BOT_TOKEN);
